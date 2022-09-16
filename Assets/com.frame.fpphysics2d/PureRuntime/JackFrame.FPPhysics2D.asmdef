@@ -1,0 +1,16 @@
+{
+    "name": "JackFrame.FPPhysics2D",
+    "rootNamespace": "",
+    "references": [
+        "FixedMath.NET"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}
