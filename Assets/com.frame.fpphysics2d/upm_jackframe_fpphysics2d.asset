@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: upm_jackframe_fpphysics2d
   m_EditorClassIdentifier: 
   dependancyModel:
-    packageName: com.jackwithtea.fpphysics2d
-    gitUrl: ssh://git@github.com:chenwansal/JackFrame.git
-    branchOrTag: develop
+    packageName: com.frame.fpphysics2d
+    gitUrl: ssh://git@github.com:chenwansal/FPPhysics2D.git
+    branchOrTag: main
