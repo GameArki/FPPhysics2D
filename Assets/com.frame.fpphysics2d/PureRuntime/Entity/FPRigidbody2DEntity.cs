@@ -9,6 +9,14 @@ namespace JackFrame.FPPhysics2D {
         uint id;
         public uint ID => id;
 
+        // ==== Holder ====
+        // 此处后续需要写个文档来说明用途
+        // 总之:
+        //      holderPtr 就是作为一个指针使用
+        //      holderType 用于判断将这个指针强转成哪个上层的类型
+        public int holderType;
+        public object holderPtr;
+
         // ==== Transform ====
         FPTransform2D tf;
         public FPTransform2D TF => tf;
@@ -70,9 +78,28 @@ namespace JackFrame.FPPhysics2D {
 
         }
 
+        // ==== Holder ====
+        public void SetHolder(object holderPtr, int holderType) {
+            this.holderPtr = holderPtr;
+            this.holderType = holderType;
+        }
+
         // ==== Transform ====
         public void SetPos(in FPVector2 pos) {
             tf.SetPos(pos);
+        }
+
+        public void SetLocalTR(in FPVector2 localPos, in FP64 localRadAngle) {
+            tf.SetLocalPos(localPos);
+            tf.SetLocalRadianAngle(localRadAngle);
+        }
+
+        public void UpdateByParentTransform(FPTransform2D parent) {
+            // 1. Rotate
+            tf.SetRot(parent.Rot * tf.Rot);
+
+            // 2. Translate
+            tf.SetPos(parent.Pos + tf.Rot * tf.LocalPos);
         }
 
         public void SetTR(in FPVector2 pos, in FP64 radAngle) {

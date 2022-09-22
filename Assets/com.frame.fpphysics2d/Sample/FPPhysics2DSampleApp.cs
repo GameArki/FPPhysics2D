@@ -96,7 +96,7 @@ namespace JackFrame.Sample {
 
             var velo = role.LinearVelocity;
             velo.y -= 1;
-            if (Input.GetKeyUp(KeyCode.Space)) {
+            if (Input.GetKeyDown(KeyCode.Space)) {
                 velo.y = 12;
             }
 
