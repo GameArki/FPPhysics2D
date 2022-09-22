@@ -19,6 +19,17 @@ namespace JackFrame.FPPhysics2D {
             cosValue = FP64.Cos(radAngle);
         }
 
+        public static FPRotation2D operator *(in FPRotation2D a, in FPRotation2D b) {
+            var radAngle = (a.radAngle + b.radAngle) % 360;
+            return new FPRotation2D(radAngle);
+        }
+
+        public static FPVector2 operator *(in FPRotation2D rot, in FPVector2 pos) {
+            FP64 x = rot.CosValue * pos.x - rot.SinValue * pos.y;
+            FP64 y = rot.SinValue * pos.x + rot.CosValue * pos.y;
+            return new FPVector2(x, y);
+        }
+
     }
 
 }
