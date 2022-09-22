@@ -94,12 +94,19 @@ namespace JackFrame.FPPhysics2D {
             tf.SetLocalRadianAngle(localRadAngle);
         }
 
-        public void UpdateByParentTransform(FPTransform2D parent) {
+        public void UpdateByParentTransform(FPTransform2D parent, bool isFlipX = false) {
+
+            // FIXME: isFlipX 应当同时改变碰撞盒的反转
+
             // 1. Rotate
             tf.SetRot(parent.Rot * tf.Rot);
 
             // 2. Translate
-            tf.SetPos(parent.Pos + tf.Rot * tf.LocalPos);
+            if (!isFlipX) {
+                tf.SetPos(parent.Pos + tf.Rot * tf.LocalPos);
+            } else {
+                tf.SetPos(parent.Pos - tf.Rot * tf.LocalPos);
+            }
         }
 
         public void SetTR(in FPVector2 pos, in FP64 radAngle) {
