@@ -58,6 +58,9 @@ namespace JackFrame.FPPhysics2D {
 
         public void Remove(FPRigidbody2DEntity rb) {
             context.RBRepo.Remove(rb);
+
+            var contactRepo = context.IntersectContactRepo;
+            contactRepo.RemoveByID(rb.ID);
         }
 
         public FPRigidbody2DEntity[] GetAllRigidbody() {

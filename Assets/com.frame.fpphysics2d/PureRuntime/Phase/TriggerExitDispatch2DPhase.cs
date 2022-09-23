@@ -35,6 +35,9 @@ namespace JackFrame.FPPhysics2D {
 
             // Remove From Collision
             var collisionRepo = context.CollisionContactRepo;
+            if (a.IsTrigger && b.IsTrigger) {
+                return;
+            }
             var collisionEventCenter = context.CollisionEventCenter;
             ulong key = DictionaryKeyUtil.ComputeRBKey(a, b);
             if (collisionRepo.Remove(key)) {

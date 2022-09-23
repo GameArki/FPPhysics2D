@@ -24,6 +24,26 @@ namespace JackFrame.FPPhysics2D {
             all.Remove(model.key);
         }
 
+        public void RemoveByID(uint id) {
+            ulong target = 0;
+            foreach (var kv in all) {
+                var key = kv.Key;
+                uint a = (uint)key;
+                if (a == id) {
+                    target = key;
+                    break;
+                }
+                uint b = (uint)(key >> 32);
+                if (b == id) {
+                    target = key;
+                    break;
+                }
+            }
+            if (target != 0) {
+                all.Remove(target);
+            }
+        }
+
         public void RemoveByKey(ulong key) {
             all.Remove(key);
         }
