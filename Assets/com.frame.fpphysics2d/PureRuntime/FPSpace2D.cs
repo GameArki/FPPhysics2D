@@ -1,9 +1,13 @@
 using FixMath.NET;
 using JackFrame.FPPhysics2D.Phases;
+using JackFrame.FPPhysics2D.API;
 
 namespace JackFrame.FPPhysics2D {
 
     public class FPSpace2D {
+
+        FPEventTrigger events;
+        public FPEventTrigger Events => events;
 
         FPContext2D context;
 
@@ -19,6 +23,7 @@ namespace JackFrame.FPPhysics2D {
 
         public FPSpace2D(FPVector2 gravity) {
 
+            events = new FPEventTrigger();
             context = new FPContext2D();
 
             // ==== Ctor ====
@@ -32,6 +37,7 @@ namespace JackFrame.FPPhysics2D {
             collisionEnterAndStayDispatchPhase = new CollisionEnterAndStayDispatch2DPhase();
 
             // ==== Inject ====
+            context.Inject(events);
             forcePhase.Inject(context);
             prunePhase.Inject(context);
             triggerExitDispatchPhase.Inject(context);

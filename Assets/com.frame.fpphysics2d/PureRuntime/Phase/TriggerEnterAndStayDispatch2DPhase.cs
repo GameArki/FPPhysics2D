@@ -36,6 +36,12 @@ namespace JackFrame.FPPhysics2D.Phases {
                 b.OnTriggerEnter(new Trigger2DEventModel(a));
             }
 
+            // Public Trigger
+            if (a.IsTrigger || b.IsTrigger) {
+                var events = context.Events;
+                events.TriggerEnter(new API.TriggerEventArgs(a, b));
+            }
+
             // Add To Collision
             var collisionRepo = context.CollisionContactRepo;
             var collisionEventCenter = context.CollisionEventCenter;
@@ -55,6 +61,13 @@ namespace JackFrame.FPPhysics2D.Phases {
             if (b.IsTrigger) {
                 b.OnTriggerStay(new Trigger2DEventModel(a));
             }
+
+            // Public Trigger
+            if (a.IsTrigger || b.IsTrigger) {
+                var events = context.Events;
+                events.TriggerStay(new API.TriggerEventArgs(a, b));
+            }
+
         }
 
     }
