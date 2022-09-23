@@ -26,6 +26,11 @@ namespace JackFrame.FPPhysics2D {
             var b = ev.B;
             a.OnCollisionEnter(new Collision2DEventModel(b));
             b.OnCollisionEnter(new Collision2DEventModel(a));
+
+            // Public Collision
+            var events = context.Events;
+            events.CollisionEnter(new API.CollisionEventArgs(a, b));
+
         }
 
         void ApplyCollisionStay(in InternalCollision2DEventModel ev) {
@@ -33,6 +38,10 @@ namespace JackFrame.FPPhysics2D {
             var b = ev.B;
             a.OnCollisionStay(new Collision2DEventModel(b));
             b.OnCollisionStay(new Collision2DEventModel(a));
+
+            // Public Collision
+            var events = context.Events;
+            events.CollisionStay(new API.CollisionEventArgs(a, b));
         }
 
     }

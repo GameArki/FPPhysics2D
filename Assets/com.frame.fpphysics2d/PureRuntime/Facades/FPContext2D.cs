@@ -1,6 +1,12 @@
+using JackFrame.FPPhysics2D.API;
+
 namespace JackFrame.FPPhysics2D {
 
     internal class FPContext2D {
+
+        // ==== API ====
+        IFPEventTrigger events;
+        public IFPEventTrigger Events => events;
 
         // ==== Environment ====
         FPEnvironment2DModel env;
@@ -46,6 +52,10 @@ namespace JackFrame.FPPhysics2D {
             this.intersectContactRepo = new IntersectContact2DRepository();
             this.collisionContactRepo = new CollisionContact2DRepository();
 
+        }
+
+        public void Inject(IFPEventTrigger eventTrigger) {
+            this.events = eventTrigger;
         }
 
     }

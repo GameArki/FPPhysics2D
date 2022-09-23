@@ -27,6 +27,12 @@ namespace JackFrame.FPPhysics2D {
                 b.OnTriggerExit(new Trigger2DEventModel(a));
             }
 
+            // Public Trigger
+            if (a.IsTrigger || b.IsTrigger) {
+                var events = context.Events;
+                events.TriggerExit(new API.TriggerEventArgs(a, b));
+            }
+
             // Remove From Collision
             var collisionRepo = context.CollisionContactRepo;
             var collisionEventCenter = context.CollisionEventCenter;
