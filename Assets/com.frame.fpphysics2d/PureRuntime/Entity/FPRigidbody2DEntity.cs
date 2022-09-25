@@ -99,7 +99,7 @@ namespace JackFrame.FPPhysics2D {
             // FIXME: isFlipX 应当同时改变碰撞盒的反转
 
             // 1. Rotate
-            tf.SetRot(parent.Rot * tf.Rot);
+            tf.SetRot(parent.Rot * tf.LocalRot);
 
             // 2. Translate
             if (!isFlipX) {
