@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -25,22 +26,26 @@ namespace JackFrame.FPPhysics2D {
         }
 
         public void RemoveByID(uint id) {
-            ulong target = 0;
+            Span<ulong> targets = stackalloc ulong[all.Count];
+            int index = 0;
             foreach (var kv in all) {
                 var key = kv.Key;
                 uint a = (uint)key;
                 if (a == id) {
-                    target = key;
-                    break;
+                    targets[index] = key;
+                    index += 1;
                 }
                 uint b = (uint)(key >> 32);
                 if (b == id) {
-                    target = key;
-                    break;
+                    targets[index] = key;
+                    index += 1;
                 }
             }
-            if (target != 0) {
-                all.Remove(target);
+            if (index != 0) {
+                for (int i = 0; i < targets.Length; i += 1) {
+                    var target = targets[i];
+                    all.Remove(target);
+                }
             }
         }
 

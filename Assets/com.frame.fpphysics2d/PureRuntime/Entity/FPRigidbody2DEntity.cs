@@ -96,6 +96,10 @@ namespace JackFrame.FPPhysics2D {
 
         public void UpdateByParentTransform(FPTransform2D parent, bool isFlipX = false) {
 
+            if (tf.LocalRot.RadAngle == FP64.Zero && tf.LocalPos == FPVector2.Zero) {
+                return;
+            }
+
             // FIXME: isFlipX 应当同时改变碰撞盒的反转
 
             // 1. Rotate
@@ -103,9 +107,9 @@ namespace JackFrame.FPPhysics2D {
 
             // 2. Translate
             if (!isFlipX) {
-                tf.SetPos(parent.Pos + tf.Rot * tf.LocalPos);
+                tf.SetPos(parent.Pos + parent.Rot * tf.LocalPos);
             } else {
-                tf.SetPos(parent.Pos - tf.Rot * tf.LocalPos);
+                tf.SetPos(parent.Pos - parent.Rot * tf.LocalPos);
             }
         }
 
