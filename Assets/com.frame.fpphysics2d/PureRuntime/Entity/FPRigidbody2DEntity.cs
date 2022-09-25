@@ -107,9 +107,9 @@ namespace JackFrame.FPPhysics2D {
 
             // 2. Translate
             if (!isFlipX) {
-                tf.SetPos(parent.Pos + tf.Rot * tf.LocalPos);
+                tf.SetPos(parent.Pos + parent.Rot * tf.LocalPos);
             } else {
-                tf.SetPos(parent.Pos - tf.Rot * tf.LocalPos);
+                tf.SetPos(parent.Pos - parent.Rot * tf.LocalPos);
             }
         }
 
