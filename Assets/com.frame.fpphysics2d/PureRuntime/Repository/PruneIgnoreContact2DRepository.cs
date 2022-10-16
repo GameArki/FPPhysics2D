@@ -5,10 +5,10 @@ namespace JackFrame.FPPhysics2D {
 
     public class PruneIgnoreContact2DRepository {
 
-        SortedDictionary<ulong, PruneIgnoreContact2DModel> all;
+        Dictionary<ulong, PruneIgnoreContact2DModel> all;
 
         public PruneIgnoreContact2DRepository() {
-            this.all = new SortedDictionary<ulong, PruneIgnoreContact2DModel>();
+            this.all = new Dictionary<ulong, PruneIgnoreContact2DModel>();
         }
 
         public void Add(PruneIgnoreContact2DModel model) {

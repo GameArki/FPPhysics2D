@@ -31,6 +31,11 @@ namespace JackFrame.FPPhysics2D.Phases {
 
         void ApplyIntersection(FPRigidbody2DEntity a, FPRigidbody2DEntity b) {
 
+            var ignore = context.Ignore;
+            if (ignore.IsIgnore(a.Layer, b.Layer)) {
+                return;
+            }
+
             var contactRepo = context.IntersectContactRepo;
             var pruneIgnoreContantRepo = context.PruneIgnoreContactRepo;
             var triggerEventCenter = context.TriggerEventCenter;

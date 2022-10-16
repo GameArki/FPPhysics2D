@@ -12,6 +12,10 @@ namespace JackFrame.FPPhysics2D {
         FPEnvironment2DModel env;
         public FPEnvironment2DModel Env => env;
 
+        // ==== Ignore ====
+        FPIgnoreLayer2DModel ignore;
+        public FPIgnoreLayer2DModel Ignore => ignore;
+
         // ==== Event Center ====
         // - Trigger
         Trigger2DEventCenter triggerEventCenter;
@@ -41,6 +45,7 @@ namespace JackFrame.FPPhysics2D {
         public FPContext2D() {
 
             this.env = new FPEnvironment2DModel();
+            this.ignore = new FPIgnoreLayer2DModel();
 
             // ==== Event Center ====
             this.triggerEventCenter = new Trigger2DEventCenter();

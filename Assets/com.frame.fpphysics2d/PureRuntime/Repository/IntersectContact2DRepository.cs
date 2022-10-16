@@ -7,10 +7,10 @@ namespace JackFrame.FPPhysics2D {
     // 产生交叉的对象
     public class IntersectContact2DRepository {
 
-        SortedDictionary<ulong, IntersectContact2DModel> all;
+        Dictionary<ulong, IntersectContact2DModel> all;
 
         public IntersectContact2DRepository() {
-            this.all = new SortedDictionary<ulong, IntersectContact2DModel>();
+            this.all = new Dictionary<ulong, IntersectContact2DModel>();
         }
 
         public void Add(IntersectContact2DModel model) {
@@ -26,25 +26,25 @@ namespace JackFrame.FPPhysics2D {
         }
 
         public void RemoveByID(uint id) {
-            Span<ulong> targets = stackalloc ulong[all.Count];
+            Span<ulong> targetKeys = stackalloc ulong[all.Count];
             int index = 0;
             foreach (var kv in all) {
                 var key = kv.Key;
                 uint a = (uint)key;
                 if (a == id) {
-                    targets[index] = key;
+                    targetKeys[index] = key;
                     index += 1;
                 }
                 uint b = (uint)(key >> 32);
                 if (b == id) {
-                    targets[index] = key;
+                    targetKeys[index] = key;
                     index += 1;
                 }
             }
             if (index != 0) {
-                for (int i = 0; i < targets.Length; i += 1) {
-                    var target = targets[i];
-                    all.Remove(target);
+                for (int i = 0; i < targetKeys.Length; i += 1) {
+                    var targetKey = targetKeys[i];
+                    all.Remove(targetKey);
                 }
             }
         }
