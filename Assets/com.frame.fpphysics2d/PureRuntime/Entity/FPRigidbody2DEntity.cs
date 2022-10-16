@@ -17,6 +17,10 @@ namespace JackFrame.FPPhysics2D {
         public int holderType;
         public object holderPtr;
 
+        int layer;
+        public int Layer => layer;
+        public void SetLayer(int value) => layer = value;
+
         // ==== Transform ====
         FPTransform2D tf;
         public FPTransform2D TF => tf;

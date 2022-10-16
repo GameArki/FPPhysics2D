@@ -52,6 +52,16 @@ namespace JackFrame.FPPhysics2D {
 
         }
 
+        // - Ignore
+        public void Ignore(int layer1, int layer2) {
+            context.Ignore.Ignore(layer1, layer2);
+        }
+
+        public void CancelIgnore(int layer1, int layer2) {
+            context.Ignore.CancelIgnore(layer1, layer2);
+        }
+
+        // - RB
         public void Add(FPRigidbody2DEntity rb) {
             context.RBRepo.Add(rb);
         }
