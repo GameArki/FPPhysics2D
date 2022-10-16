@@ -5,10 +5,10 @@ namespace JackFrame.FPPhysics2D {
 
     public class CollisionContact2DRepository {
 
-        SortedDictionary<ulong, CollisionContact2DModel> all;
+        Dictionary<ulong, CollisionContact2DModel> all;
 
         public CollisionContact2DRepository() {
-            this.all = new SortedDictionary<ulong, CollisionContact2DModel>();
+            this.all = new Dictionary<ulong, CollisionContact2DModel>();
         }
 
         public void Add(CollisionContact2DModel model) {

@@ -7,10 +7,10 @@ namespace JackFrame.FPPhysics2D {
     // 产生交叉的对象
     public class IntersectContact2DRepository {
 
-        SortedDictionary<ulong, IntersectContact2DModel> all;
+        Dictionary<ulong, IntersectContact2DModel> all;
 
         public IntersectContact2DRepository() {
-            this.all = new SortedDictionary<ulong, IntersectContact2DModel>();
+            this.all = new Dictionary<ulong, IntersectContact2DModel>();
         }
 
         public void Add(IntersectContact2DModel model) {
