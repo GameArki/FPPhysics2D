@@ -134,5 +134,245 @@ namespace JackFrame.FPPhysics2D {
             return (circle.Radius * circle.Radius) - diff.LengthSquared() > epsilon;
         }
 
+        // ==== Ray & Segment ====
+        public static bool IsIntersect_Ray_Segment(FPVector2 aPos, FPVector2 bPos, FPVector2 cPos, FPVector2 dPos, out FPVector2 intersectPoint) {
+            var n = (aPos.x - bPos.x) * (cPos.y - dPos.y) - (aPos.y - bPos.y) * (cPos.x - dPos.x);
+            if (n == 0) {
+                intersectPoint = FPVector2.Zero;
+                return false;
+            }
+            var t = ((aPos.x - cPos.x) * (cPos.y - dPos.y) - (aPos.y - cPos.y) * (cPos.x - dPos.x)) / n;
+            var u = ((aPos.x - cPos.x) * (aPos.y - bPos.y) - (aPos.y - cPos.y) * (aPos.x - bPos.x)) / n;
+            if (t >= 0 && t <= 1 && u >= 0) {
+                var x = aPos.x + t * (bPos.x - aPos.x);
+                var y = aPos.y + t * (bPos.y - aPos.y);
+                intersectPoint = new FPVector2((int)x, (int)y);
+                return true;
+            } else {
+                intersectPoint = FPVector2.Zero;
+                return false;
+            }
+        }
+
+        // ==== Segment & Segment ====
+        public static bool IsIntersect_Segment_Segment(FPVector2 aPos, FPVector2 bPos, FPVector2 cPos, FPVector2 dPos, out FPVector2 intersectPoint) {
+            var n = (aPos.x - bPos.x) * (cPos.y - dPos.y) - (aPos.y - bPos.y) * (cPos.x - dPos.x);
+            if (n == 0) {
+                intersectPoint = FPVector2.Zero;
+                return false;
+            }
+            var t = ((aPos.x - cPos.x) * (cPos.y - dPos.y) - (aPos.y - cPos.y) * (cPos.x - dPos.x)) / n;
+            var u = ((aPos.x - cPos.x) * (aPos.y - bPos.y) - (aPos.y - cPos.y) * (aPos.x - bPos.x)) / n;
+            if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+                var x = aPos.x + t * (bPos.x - aPos.x);
+                var y = aPos.y + t * (bPos.y - aPos.y);
+                intersectPoint = new FPVector2((int)x, (int)y);
+                return true;
+            } else {
+                intersectPoint = FPVector2.Zero;
+                return false;
+            }
+        }
+
+        // ==== Segment & Box ====
+        public static bool IsIntersect_Segment_Box(FPVector2 aPos, FPVector2 bPos, in FPTransform2D boxTf, in FPBoxShape2D box, out FPVector2 intersectPoint, in FP64 epsilon) {
+            intersectPoint = FPVector2.Zero;
+            if (boxTf.RadAngle == FP64.Zero && boxTf.RadAngle == FP64.Zero) {
+
+                // Segment & AABB
+                FPAABB2D aabb = box.GetAABB(boxTf);
+                var u = new FPVector2(aabb.Min.x, aabb.Max.y);
+                var v = new FPVector2(aabb.Max.x, aabb.Min.y);
+                var w = aabb.Min;
+                var x = aabb.Max;
+                bool isIntersect = IsIntersect_Segment_Segment(aPos, bPos, u, v, out var intersectPoint1);
+                var intersectCount = 0;
+                var _intersectPoint = FPVector2.Zero;
+                if (isIntersect) {
+                    intersectCount += 1;
+                    _intersectPoint = intersectPoint1;
+                }
+                isIntersect = IsIntersect_Segment_Segment(aPos, bPos, w, x, out var intersectPoint2);
+                if (isIntersect) {
+                    intersectCount += 1;
+                    _intersectPoint = intersectPoint2;
+                }
+                // 线段没有交点
+                if (intersectCount == 0) {
+                    intersectPoint = FPVector2.Zero;
+                    return false;
+                }
+                // 线段存在一个交点
+                if (intersectCount == 1) {
+                    intersectPoint = _intersectPoint;
+                    return true;
+                }
+                // 线段存在两个交点
+                // 返回距离a点最近的交点
+                if (intersectCount == 2) {
+                    var d1 = (intersectPoint1 - aPos).Length();
+                    var d2 = (intersectPoint2 - aPos).Length();
+                    if (d1 < d2) {
+                        intersectPoint = intersectPoint1;
+                    } else {
+                        intersectPoint = intersectPoint2;
+                    }
+                    return true;
+                }
+                return false;
+
+            } else {
+
+                // Segment & OBB
+                FPOBB2D obb = box.GetOBB(boxTf);
+                var rot = new FPRotation2D(obb.RadAngle);
+                var axisY = FPMath2DUtil.MulRotAndPos(rot, FPVector2.UnitY);
+                var axisX = FPMath2DUtil.MulRotAndPos(rot, FPVector2.UnitX);
+                var size = obb.Size;
+                var center = obb.Center;
+                FPVector2 half = size * FP64.Half;
+                FPVector2 ax = axisX * half.x;
+                FPVector2 ay = axisY * half.y;
+                var u = center + (-ax + -ay);
+                var v = center + (-ax + ay);
+                var w = center + (ax + ay);
+                var x = center + (ax + -ay);
+                bool isIntersect = IsIntersect_Segment_Segment(aPos, bPos, u, w, out var intersectPoint1);
+                if (isIntersect) return true;
+                isIntersect = IsIntersect_Segment_Segment(aPos, bPos, v, x, out var intersectPoint2);
+                if (isIntersect) return true;
+                var intersectCount = 0;
+                var _intersectPoint = FPVector2.Zero;
+
+                // 线段没有交点
+                if (intersectCount == 0) {
+                    intersectPoint = FPVector2.Zero;
+                    return false;
+                }
+                // 线段存在一个交点
+                if (intersectCount == 1) {
+                    intersectPoint = _intersectPoint;
+                    return true;
+                }
+                // 线段存在两个交点
+                // 返回距离a点最近的交点
+                if (intersectCount == 2) {
+                    var d1 = (intersectPoint1 - aPos).Length();
+                    var d2 = (intersectPoint2 - aPos).Length();
+                    if (d1 < d2) {
+                        intersectPoint = intersectPoint1;
+                    } else {
+                        intersectPoint = intersectPoint2;
+                    }
+                    return true;
+                }
+                return false;
+
+            }
+
+        }
+
+        // ==== Segment & Circle ====
+        public static bool IsIntersect_Segment_Circle(FPVector2 aPos, FPVector2 bPos, in FPTransform2D circleTF, in FPCircleShape2D circle, out FPVector2 intersectPoint, in FP64 epsilon) {
+            intersectPoint = FPVector2.Zero;
+            FPSphere2D circle_sphere = new FPSphere2D(circleTF.Pos, circle.Radius);
+            bool isIntersect = IsIntersect_Ray_Circle(aPos, bPos - aPos, circle_sphere, out var intersectPoint1, out var intersectPoint2);
+            // 射线没有交点
+            if (!isIntersect) {
+                intersectPoint = FPVector2.Zero;
+                return false;
+            }
+            // 射线存在一个交点
+            if (intersectPoint1 == intersectPoint2) {
+                intersectPoint = intersectPoint1;
+                return true;
+            }
+            // 射线存在两个交点
+            var oaLength = (aPos - circle_sphere.Center).Length();
+            var obLength = (bPos - circle_sphere.Center).Length();
+
+            var abLength = (bPos - aPos).Length();
+            var d1 = (intersectPoint1 - aPos).Length();
+            var d2 = (intersectPoint2 - aPos).Length();
+            var intersectCount = 0;
+            var _intersectPoint = FPVector2.Zero;
+            if (d1 <= abLength) {
+                intersectCount += 1;
+                _intersectPoint = intersectPoint1;
+            }
+            if (d2 <= abLength) {
+                intersectCount += 1;
+                _intersectPoint = intersectPoint1;
+            }
+            // 线段没有交点
+            if (intersectCount == 0) {
+                intersectPoint = FPVector2.Zero;
+                return false;
+            }
+            // 线段存在一个交点
+            if (intersectCount == 1) {
+                intersectPoint = _intersectPoint;
+                return true;
+            }
+            // 线段存在两个交点
+            // 返回距离a点最近的交点
+            if (intersectCount == 2) {
+                if (d1 < d2) {
+                    intersectPoint = intersectPoint1;
+                } else {
+                    intersectPoint = intersectPoint2;
+                }
+                return true;
+            }
+            return false;
+        }
+        public static bool IsIntersect_Ray_Circle(FPVector2 aPos, FPVector2 bPos, in FPTransform2D circleTF, in FPCircleShape2D circle, out FPVector2 intersectPoint) {
+            FPSphere2D circle_sphere = new FPSphere2D(circleTF.Pos, circle.Radius);
+            bool isIntersect = IsIntersect_Ray_Circle(aPos, bPos, circle_sphere, out var intersectPoint1, out var intersectPoint2);
+            if (!isIntersect) {
+                intersectPoint = FPVector2.Zero;
+                return false;
+            }
+            if (intersectPoint1 == intersectPoint2) {
+                intersectPoint = intersectPoint1;
+                return true;
+            }
+            // 返回距离a点最近的交点
+            var d1 = (intersectPoint1 - aPos).LengthSquared();
+            var d2 = (intersectPoint2 - aPos).LengthSquared();
+            if (d1 < d2) {
+                intersectPoint = intersectPoint1;
+            } else {
+                intersectPoint = intersectPoint2;
+            }
+            return true;
+        }
+        internal static bool IsIntersect_Ray_Circle(FPVector2 aPos, FPVector2 bPos, in FPSphere2D circle, out FPVector2 intersectPoint1, out FPVector2 intersectPoint2) {
+            intersectPoint1 = FPVector2.Zero;
+            intersectPoint2 = FPVector2.Zero;
+            var ab = bPos - aPos;
+            var ac = circle.Center - aPos;
+            // 单位向量
+            var direction = ab / ab.Length();
+            // 向量点乘以单位向量,得到投影长度
+            var adLength = FPVector2.Dot(ac, ab);
+            var acLengthSquared = FPVector2.Dot(ac, ac);
+            var cdLengthSquared = acLengthSquared - adLength * adLength;
+            var diLengthSquared = circle.Radius * circle.Radius - cdLengthSquared;
+            if (diLengthSquared < 0) {
+                return false;
+            }
+            // 投影点到交点的距离
+            var diLength = FP64.Sqrt(diLengthSquared);
+            var t1 = adLength - diLength;
+            var t2 = adLength + diLength;
+            if (t1 >= 0) {
+                intersectPoint1 = aPos + direction * t1;
+                intersectPoint2 = aPos + direction * t2;
+                return true;
+            }
+            return false;
+
+        }
     }
 }

@@ -6,6 +6,8 @@ namespace JackFrame.FPPhysics2D {
 
         FPVector2 size;
         public FPVector2 Size => size;
+        FPCollider2DType shapeType;
+        FPCollider2DType IShape2D.shapeType => shapeType;
 
         FP64 radius;
         public FP64 Radius => radius;
@@ -18,10 +20,12 @@ namespace JackFrame.FPPhysics2D {
         }
 
         internal FPAABB2D GetAABB(in FPTransform2D tf) {
+            shapeType = FPCollider2DType.AABB;
             return new FPAABB2D(tf.Pos, size);
         }
 
         internal FPOBB2D GetOBB(in FPTransform2D tf) {
+            shapeType = FPCollider2DType.OBB;
             return new FPOBB2D(tf.Pos, size, tf.RadAngle);
         }
 

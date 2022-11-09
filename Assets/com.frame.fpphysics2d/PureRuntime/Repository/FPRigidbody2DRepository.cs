@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -32,6 +33,12 @@ namespace JackFrame.FPPhysics2D {
             bool has = all.Remove(rb.ID);
             if (has) {
                 arr = all.Values.ToArray();
+            }
+        }
+
+        public void Foreach(Action<FPRigidbody2DEntity> action) {
+            foreach (var item in arr) {
+                action(item);
             }
         }
 
