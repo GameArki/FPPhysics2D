@@ -1,14 +1,15 @@
 {
-    "name": "Tests",
+    "name": "JackFrame.FPPhysics2D.Test.TestRunner",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "JackFrame.FPPhysics2D",
-        "JackFrame.FPPhysics2D.Unity",
-        "FixedMath.NET"
+        "FixedMath.NET",
+        "JackFrame.FPPhysics2D"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
@@ -17,7 +18,7 @@
     ],
     "autoReferenced": false,
     "defineConstraints": [
-        "UNITY_EDITOR"
+        "UNITY_INCLUDE_TESTS"
     ],
     "versionDefines": [],
     "noEngineReferences": false

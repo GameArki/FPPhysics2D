@@ -158,7 +158,7 @@ namespace JackFrame.FPPhysics2D {
         // ==== Ray & Segment ====
         public static bool IsIntersect_Ray_Segment(FPVector2 aPos, FPVector2 bPos, FPVector2 cPos, FPVector2 dPos, out FPVector2 intersectPoint) {
             var n = (aPos.x - bPos.x) * (cPos.y - dPos.y) - (aPos.y - bPos.y) * (cPos.x - dPos.x);
-            if (n == 0) {
+            if (FP64.Abs(n) < FP64.Epsilon) {
                 intersectPoint = FPVector2.Zero;
                 return false;
             }
@@ -178,7 +178,7 @@ namespace JackFrame.FPPhysics2D {
         // ==== Segment & Segment ====
         public static bool IsIntersect_Segment_Segment(FPVector2 aPos, FPVector2 bPos, FPVector2 cPos, FPVector2 dPos, out FPVector2 intersectPoint) {
             var n = (aPos.x - bPos.x) * (cPos.y - dPos.y) - (aPos.y - bPos.y) * (cPos.x - dPos.x);
-            if (n == 0) {
+            if (FP64.Abs(n) < FP64.Epsilon) {
                 intersectPoint = FPVector2.Zero;
                 return false;
             }
@@ -315,10 +315,10 @@ namespace JackFrame.FPPhysics2D {
         }
 
         // ==== Segment & Circle ====
-        static bool IsIntersect_Segment_Circle(FPVector2 aPos, FPVector2 bPos, in FPTransform2D circleTF, in FPCircleShape2D circle, out FPVector2 intersectPoint, in FP64 epsilon) {
+        public static bool IsIntersect_Segment_Circle(FPVector2 aPos, FPVector2 bPos, in FPTransform2D circleTF, in FPCircleShape2D circle, out FPVector2 intersectPoint, in FP64 epsilon) {
             intersectPoint = FPVector2.Zero;
             FPSphere2D circle_sphere = new FPSphere2D(circleTF.Pos, circle.Radius);
-            bool isIntersect = IsIntersect_Ray_Circle(aPos, bPos - aPos, circle_sphere, out var intersectPoint1, out var intersectPoint2);
+            bool isIntersect = IsIntersect_Ray_Circle(aPos, bPos - aPos, circle_sphere.Center, circle_sphere.Radius, out var intersectPoint1, out var intersectPoint2);
             // 射线没有交点
             if (!isIntersect) {
                 intersectPoint = FPVector2.Zero;
@@ -372,7 +372,7 @@ namespace JackFrame.FPPhysics2D {
         }
         static bool IsIntersect_Ray_Circle(FPVector2 aPos, FPVector2 bPos, in FPTransform2D circleTF, in FPCircleShape2D circle, out FPVector2 intersectPoint) {
             FPSphere2D circle_sphere = new FPSphere2D(circleTF.Pos, circle.Radius);
-            bool isIntersect = IsIntersect_Ray_Circle(aPos, bPos, circle_sphere, out var intersectPoint1, out var intersectPoint2);
+            bool isIntersect = IsIntersect_Ray_Circle(aPos, bPos, circle_sphere.Center, circle_sphere.Radius, out var intersectPoint1, out var intersectPoint2);
             if (!isIntersect) {
                 intersectPoint = FPVector2.Zero;
                 return false;
@@ -391,18 +391,18 @@ namespace JackFrame.FPPhysics2D {
             }
             return true;
         }
-        static bool IsIntersect_Ray_Circle(FPVector2 aPos, FPVector2 bPos, in FPSphere2D circle, out FPVector2 intersectPoint1, out FPVector2 intersectPoint2) {
+        static bool IsIntersect_Ray_Circle(FPVector2 aPos, FPVector2 bPos, FPVector2 center, FP64 radius, out FPVector2 intersectPoint1, out FPVector2 intersectPoint2) {
             intersectPoint1 = FPVector2.Zero;
             intersectPoint2 = FPVector2.Zero;
             var ab = bPos - aPos;
-            var ac = circle.Center - aPos;
+            var ac = center - aPos;
             // 单位向量
             var direction = ab / ab.Length();
             // 向量点乘以单位向量,得到投影长度
             var adLength = FPVector2.Dot(ac, ab);
             var acLengthSquared = FPVector2.Dot(ac, ac);
             var cdLengthSquared = acLengthSquared - adLength * adLength;
-            var diLengthSquared = circle.Radius * circle.Radius - cdLengthSquared;
+            var diLengthSquared = radius * radius - cdLengthSquared;
             if (diLengthSquared < 0) {
                 return false;
             }

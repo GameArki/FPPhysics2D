@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 using FixMath.NET;
 using JackFrame.FPPhysics2D.API;
 
-namespace JackFrame.FPPhysics2D.Test {
+namespace JackFrame.FPPhysics2D {
 
     public class Test_Raycast : MonoBehaviour {
 
@@ -67,7 +68,7 @@ namespace JackFrame.FPPhysics2D.Test {
         Color rayColor = Color.yellow;
 
         void OnDrawGizmos() {
-            this.space2D?.GizmosDrawAllRigidbody();
+            space2D?.GizmosDrawAllRigidbody();
             if ((lineEndGo != null) && (lineStartGo != null)) {
                 Gizmos.color = rayColor;
                 Gizmos.DrawLine(lineStartGo.transform.position, lineEndGo.transform.position);
