@@ -27,6 +27,23 @@ namespace JackFrame.FPPhysics2D {
             Gizmos.DrawLine(new Vector2(maxV2.x, minV2.y), minV2); // 4 -> 1
 
         }
+        public static void DrawBox(in FPVector2 a, in FPVector2 b, in FPVector2 c, in FPVector2 d, in Color color) {
+
+            Gizmos.color = color;
+            var aV2 = a.ToVector2();
+            var bV2 = b.ToVector2();
+            var cV2 = c.ToVector2();
+            var dV2 = d.ToVector2();
+
+            // 2 _______3
+            //  |      |
+            // 1_______4
+            Gizmos.DrawLine(aV2, bV2); // 1 -> 2
+            Gizmos.DrawLine(bV2, cV2); // 2 -> 3
+            Gizmos.DrawLine(cV2, dV2); // 3 -> 4
+            Gizmos.DrawLine(dV2, aV2); // 4 -> 1
+
+        }
 
         public static void DrawVerticis(FPVector2[] vertices, in Color c) {
             Gizmos.color = c;

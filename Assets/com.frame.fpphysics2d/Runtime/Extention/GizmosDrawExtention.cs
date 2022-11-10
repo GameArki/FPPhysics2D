@@ -18,7 +18,10 @@ namespace JackFrame.FPPhysics2D {
             switch (rb.Shape) {
                 case FPBoxShape2D box:
                     GizmosHelper.DrawPoint(pos, color);
-                    GizmosHelper.DrawCube(pos, box.Size, color);
+                    //GizmosHelper.DrawCube(pos, box.Size, color);
+                    var min = pos - box.Size / 2;
+                    var max = pos + box.Size / 2;
+                    GizmosHelper.DrawBox(min, max, color);
                     break;
                 case FPCircleShape2D circle:
                     Gizmos.color = color;
