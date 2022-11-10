@@ -164,7 +164,7 @@ namespace JackFrame.FPPhysics2D {
             }
             var t = ((aPos.x - cPos.x) * (cPos.y - dPos.y) - (aPos.y - cPos.y) * (cPos.x - dPos.x)) / n;
             var u = ((aPos.x - cPos.x) * (aPos.y - bPos.y) - (aPos.y - cPos.y) * (aPos.x - bPos.x)) / n;
-            if (t >= 0 && t <= 1 && u >= 0) {
+            if (t >= 0 && u <= 1 && u >= 0) {
                 var x = aPos.x + t * (bPos.x - aPos.x);
                 var y = aPos.y + t * (bPos.y - aPos.y);
                 intersectPoint = new FPVector2((int)x, (int)y);
@@ -316,9 +316,11 @@ namespace JackFrame.FPPhysics2D {
 
         // ==== Segment & Circle ====
         public static bool IsIntersect_Segment_Circle(FPVector2 aPos, FPVector2 bPos, in FPTransform2D circleTF, in FPCircleShape2D circle, out FPVector2 intersectPoint, in FP64 epsilon) {
+            System.Console.WriteLine("线段坐标:" + aPos + "," + bPos + "; 圆心坐标:" + circleTF.Pos + "; 半径:" + circle.Radius);
             intersectPoint = FPVector2.Zero;
             FPSphere2D circle_sphere = new FPSphere2D(circleTF.Pos, circle.Radius);
-            bool isIntersect = IsIntersect_Ray_Circle(aPos, bPos - aPos, circle_sphere.Center, circle_sphere.Radius, out var intersectPoint1, out var intersectPoint2);
+            var direction = (bPos - aPos) / (bPos - aPos).Length();
+            bool isIntersect = IsIntersect_Ray_Circle(aPos, direction, circle_sphere.Center, circle_sphere.Radius, out var intersectPoint1, out var intersectPoint2);
             // 射线没有交点
             if (!isIntersect) {
                 intersectPoint = FPVector2.Zero;
@@ -353,7 +355,7 @@ namespace JackFrame.FPPhysics2D {
             }
             // 线段存在一个交点
             if (intersectCount == 1) {
-                System.Console.WriteLine("和圆产生碰撞");
+                System.Console.WriteLine("和圆产生碰撞,存在1个交点");
                 intersectPoint = _intersectPoint;
                 return true;
             }
@@ -365,14 +367,15 @@ namespace JackFrame.FPPhysics2D {
                 } else {
                     intersectPoint = intersectPoint2;
                 }
-                System.Console.WriteLine("和圆产生碰撞");
+                System.Console.WriteLine("和圆产生碰撞,存在2个交点");
                 return true;
             }
             return false;
         }
         static bool IsIntersect_Ray_Circle(FPVector2 aPos, FPVector2 bPos, in FPTransform2D circleTF, in FPCircleShape2D circle, out FPVector2 intersectPoint) {
             FPSphere2D circle_sphere = new FPSphere2D(circleTF.Pos, circle.Radius);
-            bool isIntersect = IsIntersect_Ray_Circle(aPos, bPos, circle_sphere.Center, circle_sphere.Radius, out var intersectPoint1, out var intersectPoint2);
+            var direction = (bPos - aPos) / (bPos - aPos).Length();
+            bool isIntersect = IsIntersect_Ray_Circle(aPos, direction, circle_sphere.Center, circle_sphere.Radius, out var intersectPoint1, out var intersectPoint2);
             if (!isIntersect) {
                 intersectPoint = FPVector2.Zero;
                 return false;
@@ -391,15 +394,14 @@ namespace JackFrame.FPPhysics2D {
             }
             return true;
         }
-        static bool IsIntersect_Ray_Circle(FPVector2 aPos, FPVector2 bPos, FPVector2 center, FP64 radius, out FPVector2 intersectPoint1, out FPVector2 intersectPoint2) {
+        static bool IsIntersect_Ray_Circle(FPVector2 aPos, FPVector2 direction, FPVector2 center, FP64 radius, out FPVector2 intersectPoint1, out FPVector2 intersectPoint2) {
             intersectPoint1 = FPVector2.Zero;
             intersectPoint2 = FPVector2.Zero;
-            var ab = bPos - aPos;
             var ac = center - aPos;
-            // 单位向量
-            var direction = ab / ab.Length();
             // 向量点乘以单位向量,得到投影长度
-            var adLength = FPVector2.Dot(ac, ab);
+            var adLength = FPVector2.Dot(ac, direction);
+            System.Console.WriteLine("adLength=" + adLength);
+            // adLength < 0, 射线起点在圆心后面; adLength > 0, 射线起点在圆心前面
             var acLengthSquared = FPVector2.Dot(ac, ac);
             var cdLengthSquared = acLengthSquared - adLength * adLength;
             var diLengthSquared = radius * radius - cdLengthSquared;
@@ -408,13 +410,29 @@ namespace JackFrame.FPPhysics2D {
             }
             // 投影点到交点的距离
             var diLength = FP64.Sqrt(diLengthSquared);
-            var t1 = adLength - diLength;
-            var t2 = adLength + diLength;
-            if (t1 >= 0) {
-                intersectPoint1 = aPos + direction * t1;
-                intersectPoint2 = aPos + direction * t2;
+            // 一个交点(位于切线外接点)
+            
+            if (diLength == 0) {
+                intersectPoint1 = aPos + direction * adLength;
+                intersectPoint2 = intersectPoint1;
                 return true;
             }
+            
+            // t1是射线起点到交点1的距离,有可能是负数
+            // 交点1是距离射线起点最近的交点
+            FP64 t1 = 0;
+            FP64 t2 = 0;
+            // adLength有可能是负数,di始终是正数
+            t1 = adLength - diLength;
+            t2 = adLength + diLength;
+
+            if ((t1 > 0) || (t1 * t2 <= 0)) {
+                intersectPoint1 = aPos + direction * t1;
+                intersectPoint2 = aPos + direction * t2;
+                System.Console.WriteLine("射线碰撞");
+                return true;
+            }
+
             return false;
 
         }
