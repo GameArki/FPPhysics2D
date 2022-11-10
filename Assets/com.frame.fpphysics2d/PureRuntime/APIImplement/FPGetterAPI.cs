@@ -3,7 +3,7 @@ using FixMath.NET;
 
 namespace JackFrame.FPPhysics2D.API {
 
-    internal class FPGetterAPI : IFPGetterAPI {
+    public class FPGetterAPI : IFPGetterAPI {
 
         FPContext2D context;
         internal void Inject(FPContext2D context) {
@@ -11,49 +11,34 @@ namespace JackFrame.FPPhysics2D.API {
         }
 
         // - Raycast
-        public RaycastHit2DArgs Segmentcast2D(FPVector2 origin, FPVector2 end, FPContactFilter2DArgs contactFilter) {
+        public bool Segmentcast2D(FPVector2 origin, FPVector2 end, FPContactFilter2DArgs contactFilter, ref RaycastHit2DArgs[] hits) {
 
-            var result = new RaycastHit2DArgs();
-            result.isHit = false;
-            FPVector2 aPos = origin;
-            FPVector2 bPos = end;
+            var aPos = origin;
+            var bPos = end;
+            var result = false;
+            var _hits = hits;
 
             var repo = context.RBRepo;
             // 遍历方式待优化
             repo.Foreach(value => {
-                var shapeType = value.Shape.shapeType;
-                if (shapeType == FPCollider2DType.None) {
+                var intersectNum = 0;
+                bool isIntersect = Intersect2DUtil.IsIntersect_Segment_RB(aPos, bPos, value, out FPVector2 intersectPoint, FP64.Epsilon);
+                if (!isIntersect) {
+                    return;
+                } else {
+                    var hit = new RaycastHit2DArgs();
+                    hit.isHit = true;
+                    hit.rigidbody = value;
+                    hit.point = intersectPoint;
+                    // TODO:根据入射角和平面返回2d法线向量
+                    hit.normal = FPVector2.Zero;
+                    _hits[intersectNum] = hit;
+                    result = true;
+                    System.Console.WriteLine("产生碰撞");
                     return;
                 }
-                if (shapeType == FPCollider2DType.AABB || shapeType == FPCollider2DType.OBB) {
-                    var shape = value.Shape as FPBoxShape2D;
-                    var tf = value.TF;
-                    if (Intersect2DUtil.IsIntersect_Segment_Box(aPos, bPos, tf, shape, out FPVector2 intersectPoint, FP64.Epsilon)) {
-                        result.isHit = true;
-                        result.rigidbody = value;
-                        result.point = intersectPoint;
-                        // TODO:根据入射角和平面返回2d法线向量
-                        result.normal = FPVector2.Zero;
-                        return;
-                    }
-                }
-                if (shapeType == FPCollider2DType.Circle) {
-                    var shape = value.Shape as FPCircleShape2D;
-                    var tf = value.TF;
-                    if (Intersect2DUtil.IsIntersect_Segment_Circle(aPos, bPos, tf, shape, out FPVector2 intersectPoint, FP64.Epsilon)) {
-                        result.isHit = true;
-                        result.rigidbody = value;
-                        result.point = intersectPoint;
-                        // TODO:根据入射角和平面返回2d法线向量
-                        result.normal = FPVector2.Zero;
-                        return;
-                    }
-                }
-                if (shapeType == FPCollider2DType.Capsule) {
-                }
-                if (shapeType == FPCollider2DType.Polygon) {
-                }
             });
+            hits = _hits;
             return result;
         }
         // TODO

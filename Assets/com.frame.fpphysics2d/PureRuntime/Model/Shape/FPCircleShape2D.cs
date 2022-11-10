@@ -6,7 +6,6 @@ namespace JackFrame.FPPhysics2D {
 
         FP64 radius;
         public FP64 Radius => radius;
-        FPCollider2DType IShape2D.shapeType => FPCollider2DType.Circle;
 
         public FPCircleShape2D(in FP64 radius) {
             this.radius = radius;

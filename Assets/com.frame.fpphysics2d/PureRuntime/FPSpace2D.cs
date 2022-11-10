@@ -9,6 +9,7 @@ namespace JackFrame.FPPhysics2D {
         FPEventTrigger events;
         public FPEventTrigger Events => events;
         FPGetterAPI getterAPI;
+        public FPGetterAPI GetterAPI => getterAPI;
         FPContext2D context;
 
         // ==== Phases ====
