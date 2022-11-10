@@ -52,7 +52,7 @@ namespace JackFrame.FPPhysics2D.Test {
             FPTransform2D TF = new FPTransform2D(center, (FP64)0);
             FPCircleShape2D circle = new FPCircleShape2D((FP64)radius);
             var isIntersect = Intersect2DUtil.IsIntersect_Segment_Circle(aPos, bPos, TF, circle, out FPVector2 intersectPoint, FP64.Epsilon);
-            Assert.That(isIntersect == true);
+            Assert.That(isIntersect == expected);
         }
 
 
