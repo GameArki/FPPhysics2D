@@ -26,7 +26,7 @@ namespace JackFrame.Sample {
 
             Console.SetOut(new UnityTextWriter());
 
-            space2D = new FPSpace2D(new FPVector2(0, -981 * FP64.EN2));
+            space2D = new FPSpace2D(new FPVector2(0, -981 * FP64.EN2), new FPVector2(1000, 500), 8);
 
             allGo = new GameObject[6];
             allRB = new FPRigidbody2DEntity[6];

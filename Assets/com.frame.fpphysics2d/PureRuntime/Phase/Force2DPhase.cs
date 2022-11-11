@@ -20,6 +20,7 @@ namespace JackFrame.FPPhysics2D {
                 var rb = all[i];
                 ApplyGravity(rb, step);
                 ApplyVelocity(rb, step);
+                ApplyRebuildQuadtree(rb);
             }
 
         }
@@ -51,9 +52,19 @@ namespace JackFrame.FPPhysics2D {
 
             var velo = rb.LinearVelocity;
             var tf = rb.TF;
-            var pos = tf.Pos + velo * step;
-            tf.SetPos(pos);
+            if (velo != FPVector2.Zero) {
+                var pos = tf.Pos + velo * step;
+                rb.SetPos(pos);
+            }
 
+        }
+
+        void ApplyRebuildQuadtree(FPRigidbody2DEntity rb) {
+            if (rb.hasChangeTFOrShapeThisFrame) {
+                rb.hasChangeTFOrShapeThisFrame = false;
+                var repo = context.RBRepo;
+                repo.UpdateTree(rb);
+            }
         }
 
     }

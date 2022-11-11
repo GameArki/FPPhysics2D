@@ -22,10 +22,10 @@ namespace JackFrame.FPPhysics2D {
         Penetrate2DPhase penetratePhase;
         CollisionEnterAndStayDispatch2DPhase collisionEnterAndStayDispatchPhase;
 
-        public FPSpace2D(FPVector2 gravity) {
+        public FPSpace2D(FPVector2 gravity, FPVector2 worldSize, int maxDepth = 8) {
 
             events = new FPEventTrigger();
-            context = new FPContext2D();
+            context = new FPContext2D(worldSize, maxDepth);
 
             // ==== Ctor ====
             forcePhase = new Force2DPhase();
