@@ -148,7 +148,7 @@ namespace JackFrame.FPPhysics2D {
 
 
 
-            var isHit = getterAPI.Segmentcast2D(rayStart, rayEnd, filter, hits);
+            var isHit = getterAPI.Raycast2D(rayStart, rayEnd, filter, hits);
             if (isHit) {
                 rayColor = Color.red;
                 pointToDraw = hits[0].point;
