@@ -1,44 +1,66 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using FixMath.NET;
+using JackFrame.FPMath;
 
 namespace JackFrame.FPPhysics2D {
 
     public class FPRigidbody2DRepository {
 
-        Dictionary<uint, FPRigidbody2DEntity> all;
-        FPRigidbody2DEntity[] arr;
+        HashSet<FPRigidbody2DEntity> all;
+        FPRigidbody2DEntity[] array;
 
-        public FPRigidbody2DRepository() {
-            this.all = new Dictionary<uint, FPRigidbody2DEntity>();
-            arr = new FPRigidbody2DEntity[0];
+        // ==== Quadtree ====
+        FPQuadTree<FPRigidbody2DEntity> tree;
+        List<FPQuadTreeNode<FPRigidbody2DEntity>> candidates;
+
+        public FPRigidbody2DRepository(FPVector2 worldSize, int maxDepth) {
+            this.all = new HashSet<FPRigidbody2DEntity>();
+            this.array = new FPRigidbody2DEntity[0];
+            this.tree = new FPQuadTree<FPRigidbody2DEntity>(worldSize.x, worldSize.y, maxDepth);
+            this.candidates = new List<FPQuadTreeNode<FPRigidbody2DEntity>>(32);
         }
 
         public void Add(FPRigidbody2DEntity rb) {
-            bool has = all.TryAdd(rb.ID, rb);
+            bool has = all.Add(rb);
             if (has) {
-                arr = all.Values.ToArray();
+                // add to tree
+                var node = tree.Insert(rb, rb.GetPruneBounding());
+                rb.treeNode = node;
+
+                array = all.ToArray();
             }
         }
 
-        public FPRigidbody2DEntity[] GetArray() {
-            return arr;
+        public List<FPQuadTreeNode<FPRigidbody2DEntity>> GetCandidates(FPRigidbody2DEntity rb) {
+            tree.GetCandidates(rb.GetPruneBounding(), candidates);
+            return candidates;
         }
 
-        public bool Contains(FPRigidbody2DEntity rb) {
-            return all.ContainsKey(rb.ID);
+        public void UpdateTree(FPRigidbody2DEntity rb) {
+            tree.Remove(rb.treeNode.GetFullID());
+            tree.Insert(rb, rb.GetPruneBounding());
+        }
+
+        public FPRigidbody2DEntity[] GetArray() {
+            return array;
         }
 
         public void Remove(FPRigidbody2DEntity rb) {
-            bool has = all.Remove(rb.ID);
+            bool has = all.Remove(rb);
             if (has) {
-                arr = all.Values.ToArray();
+                // remove from tree
+                tree.Remove(rb.treeNode.GetFullID());
+                rb.treeNode = null;
+
+                array = all.ToArray();
             }
         }
 
         public void Foreach(Action<FPRigidbody2DEntity> action) {
-            foreach (var item in arr) {
-                action(item);
+            for (int i = 0; i < array.Length; i += 1) {
+                action.Invoke(array[i]);
             }
         }
 

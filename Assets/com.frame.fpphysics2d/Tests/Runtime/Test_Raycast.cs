@@ -27,7 +27,7 @@ namespace JackFrame.FPPhysics2D {
         private void Awake() {
             System.Console.WriteLine("开始");
 
-            space2D = new FPSpace2D(new FPVector2(0, -981 * FP64.EN2));
+            space2D = new FPSpace2D(new FPVector2(0, -981 * FP64.EN2), new FPVector2(1000, 500), 8);
             getterAPI = space2D.GetterAPI;
 
             allGo = new GameObject[goCount];

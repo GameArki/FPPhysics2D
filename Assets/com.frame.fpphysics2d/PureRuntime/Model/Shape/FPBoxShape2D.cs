@@ -30,6 +30,15 @@ namespace JackFrame.FPPhysics2D {
             this.radius = MathHelper.Max(size.x, size.y);
         }
 
+        FPBounds2 IShape2D.GetPruneBounding(FPTransform2D tf) {
+            if (tf.RadAngle == FP64.Zero) {
+                return new FPBounds2(tf.Pos, size);
+            } else {
+                FP64 maxSide = FP64.Max(size.x, size.y);
+                FPVector2 tarSize = new FPVector2(maxSide, maxSide);
+                return new FPBounds2(tf.Pos, tarSize);
+            }
+        }
     }
 
 }

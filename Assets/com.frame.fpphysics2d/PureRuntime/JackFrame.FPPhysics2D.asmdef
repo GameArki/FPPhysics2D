@@ -2,6 +2,7 @@
     "name": "JackFrame.FPPhysics2D",
     "rootNamespace": "",
     "references": [
+        "JackFrame.FPMath",
         "FixedMath.NET"
     ],
     "includePlatforms": [],
