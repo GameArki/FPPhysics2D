@@ -10,19 +10,44 @@ namespace JackFrame.FPPhysics2D.API {
             this.context = context;
         }
 
-        // - Raycast
-        public bool Segmentcast2D(FPVector2 origin, FPVector2 end, FPContactFilter2DArgs contactFilter, ref RaycastHit2DArgs[] hits) {
+        // - Segmentcast (All Raycast is Segmentcast)
+        public bool Segmentcast2D(FPVector2 origin, FPVector2 end, FPContactFilter2DArgs contactFilter, RaycastHit2DArgs[] hits) {
 
             var aPos = origin;
             var bPos = end;
             var result = false;
-            var _hits = hits;
 
             var repo = context.RBRepo;
-            // 遍历方式待优化
+            // 遍历效率待优化
             repo.Foreach(value => {
                 var intersectNum = 0;
-                bool isIntersect = Intersect2DUtil.IsIntersect_Segment_RB(aPos, bPos, value, out FPVector2 intersectPoint, FP64.Epsilon);
+
+                // 过滤
+                var isFiltering = contactFilter.isFiltering;
+                var useTriggers = contactFilter.useTriggers;
+                var useLayerMask = contactFilter.useLayerMask;
+                var containHolder = contactFilter.containHolder;
+                var containStatic = contactFilter.containStatic;
+
+                var holderFBID = contactFilter.holderFBID;
+                var layerMask = contactFilter.layerMask;
+
+                if (isFiltering) {
+                    if (!useTriggers && value.IsTrigger) {
+                        return;
+                    }
+                    if (useLayerMask && value.Layer == layerMask) {
+                        return;
+                    }
+                    if (!containHolder && value.ID == holderFBID) {
+                        return;
+                    }
+                    if (!containStatic && value.IsStatic) {
+                        return;
+                    }
+                }
+
+                bool isIntersect = Intersect2DUtil.IsIntersectSegment_RB(aPos, bPos, value, out FPVector2 intersectPoint, FP64.Epsilon);
                 if (!isIntersect) {
                     return;
                 } else {
@@ -32,21 +57,17 @@ namespace JackFrame.FPPhysics2D.API {
                     hit.point = intersectPoint;
                     // TODO:根据入射角和平面返回2d法线向量
                     hit.normal = FPVector2.Zero;
-                    _hits[intersectNum] = hit;
+                    hits[intersectNum] = hit;
                     result = true;
-                    System.Console.WriteLine("产生碰撞");
                     return;
                 }
             });
-            hits = _hits;
             return result;
         }
-        // TODO
-        public RaycastHit2DArgs Raycast2D(FPVector2 origin, FPVector2 direction, FP64 distance, FPContactFilter2DArgs contactFilter) {
-            var result = new RaycastHit2DArgs();
-            result.isHit = false;
-            return result;
-
+        // - Raycast (direction参数目前只支持单位向量)
+        public bool Raycast2D(FPVector2 origin, FPVector2 direction, FP64 distance, FPContactFilter2DArgs contactFilter, RaycastHit2DArgs[] hits) {
+            var end = origin + direction * distance;
+            return Segmentcast2D(origin, end, contactFilter, hits);
         }
 
     }

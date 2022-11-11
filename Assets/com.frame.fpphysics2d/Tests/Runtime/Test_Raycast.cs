@@ -14,21 +14,26 @@ namespace JackFrame.FPPhysics2D {
 
         FPSpace2D space2D;
         FPRigidbody2DEntity role => allRB[0];
+        FPGetterAPI getterAPI;
 
         public GameObject lineStartGo;
         public GameObject lineEndGo;
-
         public int goCount = 6;
+
+        RaycastHit2DArgs[] hits;
+        FPVector2 pointToDraw;
 
         private void Awake() {
             System.Console.WriteLine("开始");
 
             space2D = new FPSpace2D(new FPVector2(0, -981 * FP64.EN2));
+            getterAPI = space2D.GetterAPI;
 
             allGo = new GameObject[goCount];
             allRB = new FPRigidbody2DEntity[goCount];
 
-            /*
+            hits = new RaycastHit2DArgs[10];
+
             allGo[0] = new GameObject("go0");
             allRB[0] = FPRigidbody2DFactory.CreateBoxRB(new FPVector2(0, 0), 0, new FPVector2(1, 1));
             allGo[0].transform.position = allRB[0].TF.Pos.ToVector2();
@@ -36,10 +41,8 @@ namespace JackFrame.FPPhysics2D {
             space2D.Add(allRB[0]);
 
             allGo[1] = new GameObject("go1");
-            //allRB[1] = FPRigidbody2DFactory.CreateBoxRB(new FPVector2(1, 1), 45, new FPVector2(1, 1));
             allRB[1] = FPRigidbody2DFactory.CreateBoxRB(new FPVector2(1, 1), 0, new FPVector2(1, 1));
             allGo[1].transform.position = allRB[1].TF.Pos.ToVector2();
-            //allGo[1].transform.rotation = Quaternion.Euler(0, 45f);
             allRB[1].SetGravityScale(0);
             space2D.Add(allRB[1]);
 
@@ -47,14 +50,7 @@ namespace JackFrame.FPPhysics2D {
             allRB[2] = FPRigidbody2DFactory.CreateCircleRB(new FPVector2(3, 0), 1);
             allGo[2].transform.position = allRB[2].TF.Pos.ToVector2();
             allRB[2].SetGravityScale(0);
-            //space2D.Add(allRB[2]);
-            */
-
-            allGo[0] = new GameObject("go2");
-            allRB[0] = FPRigidbody2DFactory.CreateCircleRB(new FPVector2(3, 0), 1);
-            allGo[0].transform.position = allRB[0].TF.Pos.ToVector2();
-            allRB[0].SetGravityScale(0);
-            space2D.Add(allRB[0]);
+            space2D.Add(allRB[2]);
 
             lineStartGo = new GameObject("lineStartGo");
             lineStartGo.transform.position = new Vector2(-3, 3);
@@ -73,6 +69,7 @@ namespace JackFrame.FPPhysics2D {
                 Gizmos.color = rayColor;
                 Gizmos.DrawLine(lineStartGo.transform.position, lineEndGo.transform.position);
             }
+            GizmosHelper.DrawPoint(pointToDraw, Color.red);
         }
 
         public void Clear() {
@@ -114,11 +111,12 @@ namespace JackFrame.FPPhysics2D {
             var rayStart = new FPVector2((FP64)lineStartGo.transform.position.x, (FP64)lineStartGo.transform.position.y);
             var rayEnd = new FPVector2((FP64)lineEndGo.transform.position.x, (FP64)lineEndGo.transform.position.y);
             var contactFilter = new FPContactFilter2DArgs();
-            var getterApi = space2D.GetterAPI;
-            var intersectResult = new RaycastHit2DArgs[10];
-            var isHit = getterApi.Segmentcast2D(rayStart, rayEnd, contactFilter, ref intersectResult);
+
+
+            var isHit = getterAPI.Segmentcast2D(rayStart, rayEnd, contactFilter, hits);
             if (isHit) {
                 rayColor = Color.red;
+                pointToDraw = hits[0].point;
                 Debug.Log("碰撞");
             } else {
                 rayColor = Color.yellow;
