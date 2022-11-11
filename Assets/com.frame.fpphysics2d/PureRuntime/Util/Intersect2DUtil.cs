@@ -158,7 +158,7 @@ namespace JackFrame.FPPhysics2D {
         // ==== Ray & Segment ====
         static bool IsIntersectRay_Segment(in FPVector2 aPos, in FPVector2 bPos, in FPVector2 cPos, in FPVector2 dPos, out FPVector2 intersectPoint, in FP64 epsilon) {
             var n = (aPos.x - bPos.x) * (cPos.y - dPos.y) - (aPos.y - bPos.y) * (cPos.x - dPos.x);
-            if (FP64.Abs(n) < FP64.Epsilon) {
+            if (FP64.Abs(n) < epsilon) {
                 intersectPoint = FPVector2.Zero;
                 return false;
             }
@@ -178,7 +178,7 @@ namespace JackFrame.FPPhysics2D {
         // ==== Segment & Segment ====
         static bool IsIntersectSegment_Segment(in FPVector2 aPos, in FPVector2 bPos, in FPVector2 cPos, in FPVector2 dPos, out FPVector2 intersectPoint, in FP64 epsilon) {
             var n = (aPos.x - bPos.x) * (cPos.y - dPos.y) - (aPos.y - bPos.y) * (cPos.x - dPos.x);
-            if (FP64.Abs(n) < FP64.Epsilon) {
+            if (FP64.Abs(n) < epsilon) {
                 intersectPoint = FPVector2.Zero;
                 return false;
             }
@@ -334,7 +334,7 @@ namespace JackFrame.FPPhysics2D {
             var diLength = FP64.Sqrt(diLengthSquared);
             // 一个交点(位于切线外接点)
 
-            if (diLength == epsilon) {
+            if (diLength > epsilon) {
                 intersectPoint1 = aPos + direction * adLength;
                 intersectPoint2 = intersectPoint1;
                 return true;
