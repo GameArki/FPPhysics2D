@@ -23,13 +23,12 @@ namespace JackFrame.FPPhysics2D.Phases {
                 }
 
                 var res = repo.GetCandidates(cur);
-                res.ForEach(tarNode => {
-                    var tar = tarNode.Value;
+                foreach (var tar in res) {
                     if (tar.ID == cur.ID) {
-                        return;
+                        continue;
                     }
                     ApplyIntersection(cur, tar);
-                });
+                }
             }
 
         }
