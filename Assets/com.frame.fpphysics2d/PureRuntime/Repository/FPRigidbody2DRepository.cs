@@ -13,13 +13,13 @@ namespace JackFrame.FPPhysics2D {
 
         // ==== Quadtree ====
         FPQuadTree<FPRigidbody2DEntity> tree;
-        List<FPQuadTreeNode<FPRigidbody2DEntity>> candidates;
+        HashSet<FPRigidbody2DEntity> candidates;
 
         public FPRigidbody2DRepository(FPVector2 worldSize, int maxDepth) {
             this.all = new HashSet<FPRigidbody2DEntity>();
             this.array = new FPRigidbody2DEntity[0];
             this.tree = new FPQuadTree<FPRigidbody2DEntity>(worldSize.x, worldSize.y, maxDepth);
-            this.candidates = new List<FPQuadTreeNode<FPRigidbody2DEntity>>(32);
+            this.candidates = new HashSet<FPRigidbody2DEntity>(32);
         }
 
         public void Add(FPRigidbody2DEntity rb) {
@@ -33,8 +33,8 @@ namespace JackFrame.FPPhysics2D {
             }
         }
 
-        public List<FPQuadTreeNode<FPRigidbody2DEntity>> GetCandidates(FPRigidbody2DEntity rb) {
-            tree.GetCandidates(rb.GetPruneBounding(), candidates);
+        public HashSet<FPRigidbody2DEntity> GetCandidates(FPRigidbody2DEntity rb) {
+            tree.GetCandidateValues(rb.GetPruneBounding(), candidates);
             return candidates;
         }
 
