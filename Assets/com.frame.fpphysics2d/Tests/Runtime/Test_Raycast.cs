@@ -69,7 +69,8 @@ namespace JackFrame.FPPhysics2D {
                 Gizmos.color = rayColor;
                 Gizmos.DrawLine(lineStartGo.transform.position, lineEndGo.transform.position);
             }
-            GizmosHelper.DrawPoint(pointToDraw, Color.red);
+            GizmosHelper.DrawPoint(pointToDraw, Color.cyan);
+
         }
 
         public void Clear() {

@@ -167,7 +167,7 @@ namespace JackFrame.FPPhysics2D {
             if (t >= 0 && u <= 1 && u >= 0) {
                 var x = aPos.x + t * (bPos.x - aPos.x);
                 var y = aPos.y + t * (bPos.y - aPos.y);
-                intersectPoint = new FPVector2((int)x, (int)y);
+                intersectPoint = new FPVector2(x, y);
                 return true;
             } else {
                 intersectPoint = FPVector2.Zero;
@@ -187,7 +187,7 @@ namespace JackFrame.FPPhysics2D {
             if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
                 var x = aPos.x + t * (bPos.x - aPos.x);
                 var y = aPos.y + t * (bPos.y - aPos.y);
-                intersectPoint = new FPVector2((int)x, (int)y);
+                intersectPoint = new FPVector2(x, y);
                 return true;
             } else {
                 intersectPoint = FPVector2.Zero;
