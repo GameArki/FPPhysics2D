@@ -10,8 +10,9 @@ namespace JackFrame.FPPhysics2D.API {
             this.context = context;
         }
 
-        // - Segmentcast (All Raycast is Segmentcast)
-        public bool Segmentcast2D(FPVector2 origin, FPVector2 end, FPContactFilter2DArgs contactFilter, RaycastHit2DArgs[] hits) {
+        // - Raycast 
+        // TODO: 针对不传hits时的优化
+        public bool Raycast2D(in FPVector2 origin, in FPVector2 end, FPContactFilter2DArgs contactFilter, RaycastHit2DArgs[] hits) {
 
             var aPos = origin;
             var bPos = end;
@@ -29,7 +30,7 @@ namespace JackFrame.FPPhysics2D.API {
                 var containHolder = contactFilter.containHolder;
                 var containStatic = contactFilter.containStatic;
 
-                var holderFBID = contactFilter.holderFBID;
+                var holderFBID = contactFilter.holderRBID;
                 var layerMask = contactFilter.layerMask;
 
                 if (isFiltering) {
@@ -47,7 +48,7 @@ namespace JackFrame.FPPhysics2D.API {
                     }
                 }
 
-                bool isIntersect = Intersect2DUtil.IsIntersectSegment_RB(aPos, bPos, value, out FPVector2 intersectPoint, FP64.Epsilon);
+                bool isIntersect = Intersect2DUtil.IsIntersectRay_RB(aPos, bPos, value, out FPVector2 intersectPoint, FP64.Epsilon);
                 if (!isIntersect) {
                     return;
                 } else {
@@ -64,10 +65,10 @@ namespace JackFrame.FPPhysics2D.API {
             });
             return result;
         }
-        // - Raycast (direction参数目前只支持单位向量)
-        public bool Raycast2D(FPVector2 origin, FPVector2 direction, FP64 distance, FPContactFilter2DArgs contactFilter, RaycastHit2DArgs[] hits) {
+
+        public bool Raycast2DByDirection(in FPVector2 origin, in FPVector2 direction, in FP64 distance, FPContactFilter2DArgs contactFilter, RaycastHit2DArgs[] hits) {
             var end = origin + direction * distance;
-            return Segmentcast2D(origin, end, contactFilter, hits);
+            return Raycast2D(origin, end, contactFilter, hits);
         }
 
     }

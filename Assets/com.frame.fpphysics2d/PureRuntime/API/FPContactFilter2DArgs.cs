@@ -4,7 +4,7 @@ namespace JackFrame.FPPhysics2D.API {
         public bool isFiltering;
         public bool useTriggers; // 默认为 false, 即不检测 Trigger
         public bool containHolder; // 默认为 true, 即会检测自身
-        public int holderFBID;
+        public uint holderRBID;
         public bool containStatic; // 默认为 false, 即不检测静态物体
         public bool useLayerMask;
         public int layerMask;
