@@ -156,6 +156,8 @@ namespace JackFrame.FPPhysics2D {
             } else {
                 rayColor = Color.yellow;
             }
+            var deltaTime = FP64.EN3 * 34;
+            space2D.Tick(deltaTime);
         }
 
     }

@@ -38,6 +38,11 @@ namespace JackFrame.FPPhysics2D {
             return candidates;
         }
 
+        public HashSet<FPRigidbody2DEntity> GetCandidatesByBounds(FPBounds2 bounds) {
+            tree.GetCandidateValues(bounds, candidates);
+            return candidates;
+        }
+
         public void UpdateTree(FPRigidbody2DEntity rb) {
             tree.Remove(rb.treeNode.GetFullID());
             tree.Insert(rb, rb.GetPruneBounding());
