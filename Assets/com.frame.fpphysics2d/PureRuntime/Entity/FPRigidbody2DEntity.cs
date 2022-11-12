@@ -1,5 +1,6 @@
 using System;
 using FixMath.NET;
+using JackFrame.FPMath;
 
 namespace JackFrame.FPPhysics2D {
 
@@ -49,6 +50,10 @@ namespace JackFrame.FPPhysics2D {
         FP64 gravityScale;
         public FP64 GravityScale => gravityScale;
 
+        // ==== Quadtree ====
+        public bool hasChangeTFOrShapeThisFrame;
+        internal FPQuadTreeNode<FPRigidbody2DEntity> treeNode;
+
         // ==== Event ====
         // - Trigger
         public event Action<Trigger2DEventModel> OnTriggerEnterHandle;
@@ -64,9 +69,9 @@ namespace JackFrame.FPPhysics2D {
 
             id_record += 1;
             this.id = id_record;
-            
+
             this.tf = new FPTransform2D(pos, radAngle);
-            
+
             this.shape = shape;
 
             this.material = new FPMaterial2DModel();
@@ -91,6 +96,7 @@ namespace JackFrame.FPPhysics2D {
         // ==== Transform ====
         public void SetPos(in FPVector2 pos) {
             tf.SetPos(pos);
+            ChangeTFOrShapeThisFrame();
         }
 
         public void SetLocalTR(in FPVector2 localPos, in FP64 localRadAngle) {
@@ -115,11 +121,17 @@ namespace JackFrame.FPPhysics2D {
             } else {
                 tf.SetPos(parent.Pos - parent.Rot * tf.LocalPos);
             }
+            ChangeTFOrShapeThisFrame();
+        }
+
+        void ChangeTFOrShapeThisFrame() {
+            hasChangeTFOrShapeThisFrame = true;
         }
 
         public void SetTR(in FPVector2 pos, in FP64 radAngle) {
             tf.SetPos(pos);
             tf.SetRadianAngle(radAngle);
+            ChangeTFOrShapeThisFrame();
         }
 
         public void SetRotDegreeAngle(in FP64 degAngle) {
@@ -149,6 +161,11 @@ namespace JackFrame.FPPhysics2D {
 
         public void SetGravityScale(FP64 scale) {
             this.gravityScale = scale;
+        }
+
+        // ==== Quadtree ==== 
+        public FPBounds2 GetPruneBounding() {
+            return shape.GetPruneBounding(tf);
         }
 
         // ==== Event ====

@@ -14,15 +14,19 @@ namespace JackFrame.FPPhysics2D.Phases {
 
         internal void Tick(in FP64 step) {
 
-            var arr = context.RBRepo.GetArray();
+            var repo = context.RBRepo;
+            var arr = repo.GetArray();
             for (int i = 0; i < arr.Length; i += 1) {
                 FPRigidbody2DEntity cur = arr[i];
                 if (cur.IsStatic) {
                     continue;
                 }
-                for (int j = 0; j < arr.Length; j += 1) {
-                    if (i == j) continue;
-                    FPRigidbody2DEntity tar = arr[j];
+
+                var res = repo.GetCandidates(cur);
+                foreach (var tar in res) {
+                    if (tar.ID == cur.ID) {
+                        continue;
+                    }
                     ApplyIntersection(cur, tar);
                 }
             }
