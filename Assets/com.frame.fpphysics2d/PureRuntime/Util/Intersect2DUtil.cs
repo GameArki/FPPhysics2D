@@ -323,18 +323,17 @@ namespace JackFrame.FPPhysics2D {
             // adLength < 0, 射线起点在圆心后面; adLength > 0, 射线起点在圆心前面
             var acLengthSquared = FPVector2.Dot(ac, ac);
             var cdLengthSquared = acLengthSquared - adLength * adLength;
-            if (cdLengthSquared < 0) {
+            if (cdLengthSquared < -epsilon) {
                 return false;
             }
             var diLengthSquared = radius * radius - cdLengthSquared;
-            if (diLengthSquared < 0) {
+            if (diLengthSquared < -epsilon) {
                 return false;
             }
             // 投影点到交点的距离
             var diLength = FP64.Sqrt(diLengthSquared);
             // 一个交点(位于切线外接点)
-
-            if (diLength > epsilon) {
+            if (FP64.Abs(diLength) < epsilon) {
                 intersectPoint1 = aPos + direction * adLength;
                 intersectPoint2 = intersectPoint1;
                 return true;
@@ -342,18 +341,16 @@ namespace JackFrame.FPPhysics2D {
 
             // t1是射线起点到交点1的距离,有可能是负数
             // 交点1是距离射线起点最近的交点
-            FP64 t1 = 0;
-            FP64 t2 = 0;
-            t1 = adLength - diLength;
-            t2 = adLength + diLength;
+            FP64 t1 = adLength - diLength;
+            FP64 t2 = adLength + diLength;
 
-            if (t1 > 0) {
+            if (t1 > epsilon) {
                 intersectPoint1 = aPos + direction * t1;
                 intersectPoint2 = aPos + direction * t2;
                 System.Console.WriteLine("射线碰撞");
                 return true;
             }
-            if (t1 * t2 <= 0) {
+            if (t1 * t2 <= -epsilon) {
                 intersectPoint2 = aPos + direction * t2;
                 intersectPoint1 = intersectPoint2;
                 System.Console.WriteLine("射线碰撞");
