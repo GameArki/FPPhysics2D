@@ -261,13 +261,49 @@ namespace JackFrame.FPPhysics2D {
             intersectPoint = FPVector2.Zero;
             FPSphere2D circle_sphere = new FPSphere2D(circleTF.Pos, circle.Radius);
             var direction = (bPos - aPos) / (bPos - aPos).Length();
-            // 粗筛
-            bool isIntersect = IsIntersectRay_Circle_Prune(aPos, direction, circle_sphere.Center, circle_sphere.Radius, out var intersectPoint1, out var intersectPoint2, in epsilon);
-            // 粗筛没有交点
-            if (!isIntersect) {
-                intersectPoint = FPVector2.Zero;
+
+            // 射线检测
+            var center = circle_sphere.Center;
+            var radius = circle_sphere.Radius;
+            var intersectPoint1 = FPVector2.Zero;
+            var intersectPoint2 = FPVector2.Zero;
+            var ac = center - aPos;
+            // 向量点乘以单位向量,得到投影长度
+            var adLength = FPVector2.Dot(ac, direction);
+            System.Console.WriteLine("adLength=" + adLength);
+            // adLength < 0, 射线起点在圆心后面; adLength > 0, 射线起点在圆心前面
+            var acLengthSquared = FPVector2.Dot(ac, ac);
+            var cdLengthSquared = acLengthSquared - adLength * adLength;
+            if (cdLengthSquared < -epsilon) {
                 return false;
             }
+            var diLengthSquared = radius * radius - cdLengthSquared;
+            if (diLengthSquared < -epsilon) {
+                return false;
+            }
+            // 投影点到交点的距离
+            var diLength = FP64.Sqrt(diLengthSquared);
+            // 一个交点(位于切线外接点)
+            if (FP64.Abs(diLength) < epsilon) {
+                intersectPoint1 = aPos + direction * adLength;
+                intersectPoint2 = intersectPoint1;
+                return true;
+            }
+            // t1是射线起点到交点1的距离,有可能是负数
+            // 交点1是距离射线起点最近的交点
+            FP64 t1 = adLength - diLength;
+            FP64 t2 = adLength + diLength;
+            if (t1 > epsilon) {
+                intersectPoint1 = aPos + direction * t1;
+                intersectPoint2 = aPos + direction * t2;
+                System.Console.WriteLine("射线碰撞");
+            }
+            if (t1 * t2 <= -epsilon) {
+                intersectPoint2 = aPos + direction * t2;
+                intersectPoint1 = intersectPoint2;
+                System.Console.WriteLine("射线碰撞");
+            }
+
             // 粗筛存在一个交点
             if (intersectPoint1 == intersectPoint2) {
                 intersectPoint = intersectPoint1;
@@ -312,52 +348,5 @@ namespace JackFrame.FPPhysics2D {
             return false;
         }
 
-        static bool IsIntersectRay_Circle_Prune(in FPVector2 aPos, in FPVector2 direction, in FPVector2 center, in FP64 radius, out FPVector2 intersectPoint1, out FPVector2 intersectPoint2, in FP64 epsilon) {
-
-            intersectPoint1 = FPVector2.Zero;
-            intersectPoint2 = FPVector2.Zero;
-            var ac = center - aPos;
-            // 向量点乘以单位向量,得到投影长度
-            var adLength = FPVector2.Dot(ac, direction);
-            System.Console.WriteLine("adLength=" + adLength);
-            // adLength < 0, 射线起点在圆心后面; adLength > 0, 射线起点在圆心前面
-            var acLengthSquared = FPVector2.Dot(ac, ac);
-            var cdLengthSquared = acLengthSquared - adLength * adLength;
-            if (cdLengthSquared < -epsilon) {
-                return false;
-            }
-            var diLengthSquared = radius * radius - cdLengthSquared;
-            if (diLengthSquared < -epsilon) {
-                return false;
-            }
-            // 投影点到交点的距离
-            var diLength = FP64.Sqrt(diLengthSquared);
-            // 一个交点(位于切线外接点)
-            if (FP64.Abs(diLength) < epsilon) {
-                intersectPoint1 = aPos + direction * adLength;
-                intersectPoint2 = intersectPoint1;
-                return true;
-            }
-
-            // t1是射线起点到交点1的距离,有可能是负数
-            // 交点1是距离射线起点最近的交点
-            FP64 t1 = adLength - diLength;
-            FP64 t2 = adLength + diLength;
-
-            if (t1 > epsilon) {
-                intersectPoint1 = aPos + direction * t1;
-                intersectPoint2 = aPos + direction * t2;
-                System.Console.WriteLine("射线碰撞");
-                return true;
-            }
-            if (t1 * t2 <= -epsilon) {
-                intersectPoint2 = aPos + direction * t2;
-                intersectPoint1 = intersectPoint2;
-                System.Console.WriteLine("射线碰撞");
-                return true;
-            }
-            return false;
-
-        }
     }
 }
