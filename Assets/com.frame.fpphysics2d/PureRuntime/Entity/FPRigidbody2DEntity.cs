@@ -35,8 +35,8 @@ namespace JackFrame.FPPhysics2D {
         public FPMaterial2DModel Material => material;
 
         // ==== Area ====
-        FPVector2 passableDirection;
-        public FPVector2 PassableDirection => passableDirection;
+        FPPassThroughDirection passableDirection;
+        public FPPassThroughDirection PassableDirection => passableDirection;
 
         // ==== Linear ====
         bool isTrigger;
@@ -136,7 +136,7 @@ namespace JackFrame.FPPhysics2D {
         }
 
         // ==== Area ====
-        public void SetPassableDirection(in FPVector2 dir) {
+        public void SetPassableDirection(FPPassThroughDirection dir) {
             passableDirection = dir;
         }
 
