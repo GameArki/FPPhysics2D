@@ -54,17 +54,6 @@ namespace JackFrame.FPPhysics2D {
         public bool hasChangeTFOrShapeThisFrame;
         internal FPQuadTreeNode<FPRigidbody2DEntity> treeNode;
 
-        // ==== Event ====
-        // - Trigger
-        public event Action<Trigger2DEventModel> OnTriggerEnterHandle;
-        public event Action<Trigger2DEventModel> OnTriggerStayHandle;
-        public event Action<Trigger2DEventModel> OnTriggerExitHandle;
-
-        // - Collision
-        public event Action<Collision2DEventModel> OnCollisionEnterHandle;
-        public event Action<Collision2DEventModel> OnCollisionStayHandle;
-        public event Action<Collision2DEventModel> OnCollisionExitHandle;
-
         internal FPRigidbody2DEntity(in FPVector2 pos, in FP64 radAngle, IShape2D shape) {
 
             id_record += 1;
@@ -166,33 +155,6 @@ namespace JackFrame.FPPhysics2D {
         // ==== Quadtree ==== 
         public FPBounds2 GetPruneBounding() {
             return shape.GetPruneBounding(tf);
-        }
-
-        // ==== Event ====
-        // - Trigger
-        internal void OnTriggerEnter(Trigger2DEventModel ev) {
-            OnTriggerEnterHandle?.Invoke(ev);
-        }
-
-        internal void OnTriggerStay(Trigger2DEventModel ev) {
-            OnTriggerStayHandle?.Invoke(ev);
-        }
-
-        internal void OnTriggerExit(Trigger2DEventModel ev) {
-            OnTriggerExitHandle?.Invoke(ev);
-        }
-
-        // - Collision
-        internal void OnCollisionEnter(Collision2DEventModel ev) {
-            OnCollisionEnterHandle?.Invoke(ev);
-        }
-
-        internal void OnCollisionStay(Collision2DEventModel ev) {
-            OnCollisionStayHandle?.Invoke(ev);
-        }
-
-        internal void OnCollisionExit(Collision2DEventModel ev) {
-            OnCollisionExitHandle?.Invoke(ev);
         }
 
     }

@@ -20,12 +20,6 @@ namespace JackFrame.FPPhysics2D {
         void ApplyTriggerExit(in InternalTrigger2DEventModel ev) {
             var a = ev.A;
             var b = ev.B;
-            if (a.IsTrigger) {
-                a.OnTriggerExit(new Trigger2DEventModel(b));
-            }
-            if (b.IsTrigger) {
-                b.OnTriggerExit(new Trigger2DEventModel(a));
-            }
 
             // Public Trigger
             if (a.IsTrigger || b.IsTrigger) {
