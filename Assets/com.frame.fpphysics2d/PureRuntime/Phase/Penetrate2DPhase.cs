@@ -84,15 +84,20 @@ namespace JackFrame.FPPhysics2D.Phases {
 
         void RestoreDAABB_SAABB(FPRigidbody2DEntity d_rb, FPBoxShape2D d_box, FPRigidbody2DEntity s_rb, FPBoxShape2D s_box) {
             var d_velo = d_rb.LinearVelocity;
-            if (s_rb.PassableDirection != FPVector2.Zero) {
-                if (FPVector2.Dot(d_velo, s_rb.PassableDirection) > FP64.Zero) {
-                    return;
-                }
-            }
             var d_tf = d_rb.TF;
             var s_tf = s_rb.TF;
             var d_aabb = d_box.GetAABB(d_tf);
             var s_aabb = s_box.GetAABB(s_tf);
+            if (s_rb.PassableDirection == FPPassThroughDirection.Up) {
+                if (d_velo.y > FP64.Zero) {
+                    return;
+                } else if (d_velo.y < FP64.Zero) {
+                    if (d_aabb.Min.y < s_aabb.Center().y) {
+                        return;
+                    }
+                }
+            }
+
             FPVector2 d_pos = d_tf.Pos;
             FPVector2 s_pos = s_tf.Pos;
             FPVector2 diff = d_pos - s_pos;

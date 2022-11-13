@@ -29,13 +29,16 @@ namespace JackFrame.FPPhysics2D.Sample {
             }
 
             {
-                var cell = FPRigidbody2DFactory.CreateBoxRB(new FPVector2(0, 3), 0, new FPVector2(1, 1));
+                var cell = FPRigidbody2DFactory.CreateBoxRB(new FPVector2(0, 3), 0, new FPVector2(1, 4*FP64.EN1));
                 cell.SetStatic(true);
-                cell.SetPassableDirection(new FPVector2(0, 1));
+                cell.SetPassableDirection(FPPassThroughDirection.Up);
                 space.Add(cell);
             }
 
+        }
 
+        void OnGUI() {
+            GUILayout.TextArea("Press A/D to move, W to jump, S to fall through");
         }
 
         void Update() {
@@ -46,14 +49,18 @@ namespace JackFrame.FPPhysics2D.Sample {
 
             FPVector2 velo = actor.LinearVelocity;
             float x = Input.GetAxis("Horizontal") * 5.5f;
-            float y = Input.GetAxis("Jump");
+            float y = Input.GetAxis("Vertical");
             FPVector2 dir = new FPVector2(FP64.ToFP64(x), velo.y);
             if (y > 0) {
-                dir.y = FP64.ToFP64(y) * 10;
+                dir.y = 10;
+            } else if (y < 0) {
+                dir.y = -FP64.EN1;
+                actor.SetPos(actor.TF.Pos + new FPVector2(0, -FP64.EN1 *2));
             }
             actor.SetLinearVelocity(dir);
 
             space.Tick(FP64.ToFP64(Time.fixedDeltaTime));
+
         }
 
         void OnDrawGizmos() {
