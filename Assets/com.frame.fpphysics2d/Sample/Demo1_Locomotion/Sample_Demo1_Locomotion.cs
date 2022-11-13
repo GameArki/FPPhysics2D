@@ -31,6 +31,7 @@ namespace JackFrame.FPPhysics2D.Sample {
             {
                 var cell = FPRigidbody2DFactory.CreateBoxRB(new FPVector2(0, 3), 0, new FPVector2(1, 1));
                 cell.SetStatic(true);
+                cell.SetPassableDirection(new FPVector2(0, 1));
                 space.Add(cell);
             }
 

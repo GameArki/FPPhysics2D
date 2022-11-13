@@ -34,6 +34,10 @@ namespace JackFrame.FPPhysics2D {
         FPMaterial2DModel material;
         public FPMaterial2DModel Material => material;
 
+        // ==== Area ====
+        FPVector2 passableDirection;
+        public FPVector2 PassableDirection => passableDirection;
+
         // ==== Linear ====
         bool isTrigger;
         public bool IsTrigger => isTrigger;
@@ -129,6 +133,11 @@ namespace JackFrame.FPPhysics2D {
 
         public void SetRotRadianAngle(in FP64 radAngle) {
             tf.SetRadianAngle(radAngle);
+        }
+
+        // ==== Area ====
+        public void SetPassableDirection(in FPVector2 dir) {
+            passableDirection = dir;
         }
 
         // ==== Linear ====
