@@ -29,12 +29,6 @@ namespace JackFrame.FPPhysics2D.Phases {
         void ApplyTriggerEnter(in InternalTrigger2DEventModel ev) {
             var a = ev.A;
             var b = ev.B;
-            if (a.IsTrigger) {
-                a.OnTriggerEnter(new Trigger2DEventModel(b));
-            }
-            if (b.IsTrigger) {
-                b.OnTriggerEnter(new Trigger2DEventModel(a));
-            }
 
             // Public Trigger
             if (a.IsTrigger || b.IsTrigger) {
@@ -55,12 +49,6 @@ namespace JackFrame.FPPhysics2D.Phases {
         void ApplyTriggerStay(in InternalTrigger2DEventModel ev) {
             var a = ev.A;
             var b = ev.B;
-            if (a.IsTrigger) {
-                a.OnTriggerStay(new Trigger2DEventModel(b));
-            }
-            if (b.IsTrigger) {
-                b.OnTriggerStay(new Trigger2DEventModel(a));
-            }
 
             // Public Trigger
             if (a.IsTrigger || b.IsTrigger) {

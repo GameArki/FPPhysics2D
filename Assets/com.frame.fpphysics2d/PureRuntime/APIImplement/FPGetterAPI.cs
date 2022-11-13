@@ -19,8 +19,14 @@ namespace JackFrame.FPPhysics2D.API {
             var result = false;
 
             var repo = context.RBRepo;
-            // 遍历效率待优化
-            repo.Foreach(value => {
+
+            var boundsCenter = (aPos + bPos) * FP64.Half;
+            var boundsSize = FPVector2.Abs(aPos - bPos);
+
+            var bounds = new FPBounds2(boundsCenter, boundsSize);
+            var candidates = repo.GetCandidatesByBounds(bounds);
+
+            foreach (var rb in candidates) {
                 var intersectNum = 0;
 
                 // 过滤
@@ -34,35 +40,35 @@ namespace JackFrame.FPPhysics2D.API {
                 var layerMask = contactFilter.layerMask;
 
                 if (isFiltering) {
-                    if (!useTriggers && value.IsTrigger) {
-                        return;
+                    if (!useTriggers && rb.IsTrigger) {
+                        continue;
                     }
-                    if (useLayerMask && value.Layer == layerMask) {
-                        return;
+                    if (useLayerMask && rb.Layer == layerMask) {
+                        continue;
                     }
-                    if (!containHolder && value.ID == holderFBID) {
-                        return;
+                    if (!containHolder && rb.ID == holderFBID) {
+                        continue;
                     }
-                    if (!containStatic && value.IsStatic) {
-                        return;
+                    if (!containStatic && rb.IsStatic) {
+                        continue;
                     }
                 }
 
-                bool isIntersect = Intersect2DUtil.IsIntersectRay_RB(aPos, bPos, value, out FPVector2 intersectPoint, FP64.Epsilon);
+                bool isIntersect = Intersect2DUtil.IsIntersectRay_RB(aPos, bPos, rb, out FPVector2 intersectPoint, FP64.Epsilon);
                 if (!isIntersect) {
-                    return;
+                    continue;
                 } else {
                     var hit = new RaycastHit2DArgs();
                     hit.isHit = true;
-                    hit.rigidbody = value;
+                    hit.rigidbody = rb;
                     hit.point = intersectPoint;
                     // TODO:根据入射角和平面返回2d法线向量
                     hit.normal = FPVector2.Zero;
                     hits[intersectNum] = hit;
                     result = true;
-                    return;
+                    continue;
                 }
-            });
+            }
             return result;
         }
 

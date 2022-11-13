@@ -20,17 +20,11 @@ namespace JackFrame.FPPhysics2D {
         void ApplyCollisionExit(in InternalCollision2DEventModel ev) {
             var a = ev.A;
             var b = ev.B;
-            if (!a.IsTrigger) {
-                a.OnCollisionExit(new Collision2DEventModel(b));
-            }
-            if (!b.IsTrigger) {
-                b.OnCollisionExit(new Collision2DEventModel(a));
-            }
 
             // Public Collision
             var events = context.Events;
             if (!a.IsTrigger && !b.IsTrigger) {
-                events.CollisionExit(new API.CollisionEventArgs(a, b));
+                events.CollisionExit(new API.CollisionEventArgs(ev.A, ev.B));
             }
         }
 
