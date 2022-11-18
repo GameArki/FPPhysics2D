@@ -30,7 +30,7 @@ namespace JackFrame.Sample {
 
             allGo = new GameObject[6];
             allRB = new FPRigidbody2DEntity[6];
-            /*
+            
             for (int i = 0; i < allGo.Length; i += 1) {
                 allGo[i] = new GameObject("go" + i.ToString());
             }
@@ -53,6 +53,7 @@ namespace JackFrame.Sample {
                 }
             }
 
+            /*
             role.OnTriggerEnterHandle += (ev) => {
                 System.Console.WriteLine("Trigger Enter");
             };
@@ -89,12 +90,13 @@ namespace JackFrame.Sample {
                 stay2 = false;
             };
             */
+            
 
         }
 
         // Update is called once per frame
         void Update() {
-            /*
+            
             var velo = role.LinearVelocity;
             velo.y -= 1;
             if (Input.GetKeyDown(KeyCode.Space)) {
@@ -112,7 +114,7 @@ namespace JackFrame.Sample {
             role.SetLinearVelocity(velo);
 
             space2D.Tick(16 * FP64.EN3);
-            */
+            
         }
 
         void OnDrawGizmos() {
