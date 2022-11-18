@@ -5,7 +5,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "81e6befb7e743b9dad93e88d31cdd613b37e8347"
+      "hash": "6f7eec4633fbe29fcfe62be6ae253b1320d4ee03"
     },
     "com.frame.upmaster": {
       "version": "ssh://git@github.com/chenwansal/UPMaster.git?path=/Assets/com.frame.upmaster#main",

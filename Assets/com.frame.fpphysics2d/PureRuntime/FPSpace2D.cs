@@ -8,7 +8,8 @@ namespace JackFrame.FPPhysics2D {
 
         FPEventTrigger events;
         public FPEventTrigger Events => events;
-
+        FPGetterAPI getterAPI;
+        public FPGetterAPI GetterAPI => getterAPI;
         FPContext2D context;
 
         // ==== Phases ====
@@ -21,10 +22,10 @@ namespace JackFrame.FPPhysics2D {
         Penetrate2DPhase penetratePhase;
         CollisionEnterAndStayDispatch2DPhase collisionEnterAndStayDispatchPhase;
 
-        public FPSpace2D(FPVector2 gravity) {
+        public FPSpace2D(FPVector2 gravity, FPVector2 worldSize, int maxDepth = 8) {
 
             events = new FPEventTrigger();
-            context = new FPContext2D();
+            context = new FPContext2D(worldSize, maxDepth);
 
             // ==== Ctor ====
             forcePhase = new Force2DPhase();
@@ -35,6 +36,7 @@ namespace JackFrame.FPPhysics2D {
             collisionExitDispatchPhase = new CollisionExitDispatch2DPhase();
             penetratePhase = new Penetrate2DPhase();
             collisionEnterAndStayDispatchPhase = new CollisionEnterAndStayDispatch2DPhase();
+            this.getterAPI = new FPGetterAPI();
 
             // ==== Inject ====
             context.Inject(events);
@@ -46,6 +48,7 @@ namespace JackFrame.FPPhysics2D {
             collisionExitDispatchPhase.Inject(context);
             penetratePhase.Inject(context);
             collisionEnterAndStayDispatchPhase.Inject(context);
+            getterAPI.Inject(context);
 
             // ==== Init ====
             context.Env.SetGravity(gravity);

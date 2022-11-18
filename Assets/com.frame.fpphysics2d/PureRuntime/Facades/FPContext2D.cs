@@ -1,3 +1,4 @@
+using FixMath.NET;
 using JackFrame.FPPhysics2D.API;
 
 namespace JackFrame.FPPhysics2D {
@@ -42,7 +43,7 @@ namespace JackFrame.FPPhysics2D {
         CollisionContact2DRepository collisionContactRepo;
         public CollisionContact2DRepository CollisionContactRepo => collisionContactRepo;
 
-        public FPContext2D() {
+        public FPContext2D(FPVector2 worldSize, int maxDepth) {
 
             this.env = new FPEnvironment2DModel();
             this.ignore = new FPIgnoreLayer2DModel();
@@ -52,7 +53,7 @@ namespace JackFrame.FPPhysics2D {
             this.collisionEventCenter = new Collision2DEventCenter();
 
             // ==== Repo ====
-            this.rbRepo = new FPRigidbody2DRepository();
+            this.rbRepo = new FPRigidbody2DRepository(worldSize, maxDepth);
             this.pruneIgnoreContactRepo = new PruneIgnoreContact2DRepository();
             this.intersectContactRepo = new IntersectContact2DRepository();
             this.collisionContactRepo = new CollisionContact2DRepository();

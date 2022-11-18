@@ -24,6 +24,11 @@ namespace JackFrame.FPPhysics2D {
             }
         }
 
+        FPBounds2 IShape2D.GetPruneBounding(FPTransform2D tf) {
+            FPVector2 tarSize = new FPVector2(radius * 2, radius * 2);
+            return new FPBounds2(tf.Pos, tarSize);
+        }
+
     }
 
 }

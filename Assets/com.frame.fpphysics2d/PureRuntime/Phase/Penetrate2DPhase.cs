@@ -83,10 +83,21 @@ namespace JackFrame.FPPhysics2D.Phases {
         }
 
         void RestoreDAABB_SAABB(FPRigidbody2DEntity d_rb, FPBoxShape2D d_box, FPRigidbody2DEntity s_rb, FPBoxShape2D s_box) {
+            var d_velo = d_rb.LinearVelocity;
             var d_tf = d_rb.TF;
             var s_tf = s_rb.TF;
             var d_aabb = d_box.GetAABB(d_tf);
             var s_aabb = s_box.GetAABB(s_tf);
+            if (s_rb.PassableDirection == FPPassThroughDirection.Up) {
+                if (d_velo.y > FP64.Zero) {
+                    return;
+                } else if (d_velo.y < FP64.Zero) {
+                    if (d_aabb.Min.y < s_aabb.Center().y) {
+                        return;
+                    }
+                }
+            }
+
             FPVector2 d_pos = d_tf.Pos;
             FPVector2 s_pos = s_tf.Pos;
             FPVector2 diff = d_pos - s_pos;
@@ -96,7 +107,6 @@ namespace JackFrame.FPPhysics2D.Phases {
             var abs_d_min = -d_half + abs_diff;
             var abs_s_max = s_half;
             var depth_diff = abs_s_max - abs_d_min;
-            var d_velo = d_rb.LinearVelocity;
             if (depth_diff.y <= depth_diff.x) {
                 if (diff.y >= FP64.Zero) {
                     // dynamic RB is up
