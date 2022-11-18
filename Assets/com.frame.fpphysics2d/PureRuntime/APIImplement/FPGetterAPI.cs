@@ -11,19 +11,11 @@ namespace JackFrame.FPPhysics2D.API {
         }
 
         // - Raycast 
-        // TODO: 针对不传hits时的优化
-        public bool Raycast2D(in FPVector2 origin, in FPVector2 end, FPContactFilter2DArgs contactFilter, RaycastHit2DArgs[] hits) {
+        public bool Raycast2D(in FPRay2D ray, in FP64 distance, FPContactFilter2DArgs contactFilter, RayCastHit2DArgs[] hits) {
 
-            var aPos = origin;
-            var bPos = end;
             var result = false;
-
             var repo = context.RBRepo;
-
-            var boundsCenter = (aPos + bPos) * FP64.Half;
-            var boundsSize = FPVector2.Abs(aPos - bPos);
-
-            var bounds = new FPBounds2(boundsCenter, boundsSize);
+            var bounds = ray.GetPruneBounding(distance);
             var candidates = repo.GetCandidatesByBounds(bounds);
 
             foreach (var rb in candidates) {
@@ -33,10 +25,6 @@ namespace JackFrame.FPPhysics2D.API {
                 var isFiltering = contactFilter.isFiltering;
                 var useTriggers = contactFilter.useTriggers;
                 var useLayerMask = contactFilter.useLayerMask;
-                var containHolder = contactFilter.containHolder;
-                var containStatic = contactFilter.containStatic;
-
-                var holderFBID = contactFilter.holderRBID;
                 var layerMask = contactFilter.layerMask;
 
                 if (isFiltering) {
@@ -46,24 +34,19 @@ namespace JackFrame.FPPhysics2D.API {
                     if (useLayerMask && rb.Layer == layerMask) {
                         continue;
                     }
-                    if (!containHolder && rb.ID == holderFBID) {
-                        continue;
-                    }
-                    if (!containStatic && rb.IsStatic) {
+                    if (rb.IsStatic) {
                         continue;
                     }
                 }
 
-                bool isIntersect = Intersect2DUtil.IsIntersectRay_RB(aPos, bPos, rb, out FPVector2 intersectPoint, FP64.Epsilon);
+                // 检测
+                bool isIntersect = Intersect2DUtil.IsIntersectRay_RB(ray, distance, rb, out FPVector2 intersectPoint, FP64.Epsilon);
                 if (!isIntersect) {
                     continue;
                 } else {
-                    var hit = new RaycastHit2DArgs();
-                    hit.isHit = true;
+                    var hit = new RayCastHit2DArgs();
                     hit.rigidbody = rb;
                     hit.point = intersectPoint;
-                    // TODO:根据入射角和平面返回2d法线向量
-                    hit.normal = FPVector2.Zero;
                     hits[intersectNum] = hit;
                     result = true;
                     continue;
@@ -72,11 +55,64 @@ namespace JackFrame.FPPhysics2D.API {
             return result;
         }
 
-        public bool Raycast2DByDirection(in FPVector2 origin, in FPVector2 direction, in FP64 distance, FPContactFilter2DArgs contactFilter, RaycastHit2DArgs[] hits) {
-            var end = origin + direction * distance;
-            return Raycast2D(origin, end, contactFilter, hits);
+        public bool SegmentCast2DNearStart(in FPSegment2D segment, FPContactFilter2DArgs contactFilter, SegmentCastHit2DArgs[] hits) {
+            var hitType = FPSegment2DHitType.NearStart;
+            return SegmentCast2D(segment, contactFilter, hitType, hits);
+        }
+
+        public bool SegmentCast2DNearEnd(in FPSegment2D segment, FPContactFilter2DArgs contactFilter, SegmentCastHit2DArgs[] hits) {
+            var hitType = FPSegment2DHitType.NearEnd;
+            return SegmentCast2D(segment, contactFilter, hitType, hits);
+        }
+
+        public bool SegmentCast2DAll(in FPSegment2D segment, FPContactFilter2DArgs contactFilter, SegmentCastHit2DArgs[] hits) {
+            var hitType = FPSegment2DHitType.All;
+            return SegmentCast2D(segment, contactFilter, hitType, hits);
+        }
+
+        internal bool SegmentCast2D(in FPSegment2D segment, FPContactFilter2DArgs contactFilter, FPSegment2DHitType hitType, SegmentCastHit2DArgs[] hits) {
+            var result = false;
+            var repo = context.RBRepo;
+            var bounds = segment.GetPruneBounding();
+            var candidates = repo.GetCandidatesByBounds(bounds);
+
+            foreach (var rb in candidates) {
+                var intersectNum = 0;
+
+                // 过滤
+                var isFiltering = contactFilter.isFiltering;
+                var useTriggers = contactFilter.useTriggers;
+                var useLayerMask = contactFilter.useLayerMask;
+                var layerMask = contactFilter.layerMask;
+
+                if (isFiltering) {
+                    if (!useTriggers && rb.IsTrigger) {
+                        continue;
+                    }
+                    if (useLayerMask && rb.Layer == layerMask) {
+                        continue;
+                    }
+                    if (rb.IsStatic) {
+                        continue;
+                    }
+                }
+                var intersectPoints = new FPVector2[2];
+                // 检测
+                bool isIntersect = Intersect2DUtil.IsIntersectSegment_RB(segment, rb, in hitType, intersectPoints, FP64.Epsilon);
+                if (!isIntersect) {
+                    continue;
+                } else {
+                    var hit = new SegmentCastHit2DArgs();
+                    hit.rigidbody = rb;
+                    hit.points = intersectPoints;
+                    hits[intersectNum] = hit;
+                    result = true;
+                    continue;
+                }
+            }
+            return result;
+
         }
 
     }
-
 }

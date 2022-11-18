@@ -4,8 +4,10 @@ using UnityEngine;
 using UnityEditor;
 using FixMath.NET;
 using JackFrame.FPPhysics2D.API;
+using System;
+using JackFrame.FPPhysics2D;
 
-namespace JackFrame.FPPhysics2D {
+namespace JackFrame.Sample {
 
     public class Test_Raycast : MonoBehaviour {
 
@@ -16,16 +18,23 @@ namespace JackFrame.FPPhysics2D {
         FPRigidbody2DEntity role => allRB[0];
         FPGetterAPI getterAPI;
 
-        public GameObject lineStartGo;
-        public GameObject lineEndGo;
+        public GameObject rayStartGo;
+        public GameObject rayEndGo;
+
+        public GameObject segmentStartGo;
+        public GameObject segmentEndGo;
         public int goCount = 6;
 
-        RaycastHit2DArgs[] hits;
-        FPVector2 pointToDraw;
+        RayCastHit2DArgs[] rayHits;
+        SegmentCastHit2DArgs[] segmentHits;
+        FPVector2[] rayHitPoints;
+        FPVector2[] segmentHitPoints;
         FPContactFilter2DArgs filter;
 
         private void Awake() {
             System.Console.WriteLine("开始");
+            rayHitPoints = new FPVector2[goCount];
+            segmentHitPoints = new FPVector2[goCount * 2];
 
             space2D = new FPSpace2D(new FPVector2(0, -981 * FP64.EN2), new FPVector2(1000, 500), 8);
             getterAPI = space2D.GetterAPI;
@@ -33,10 +42,11 @@ namespace JackFrame.FPPhysics2D {
             allGo = new GameObject[goCount];
             allRB = new FPRigidbody2DEntity[goCount];
 
-            hits = new RaycastHit2DArgs[10];
+            rayHits = new RayCastHit2DArgs[goCount];
+            segmentHits = new SegmentCastHit2DArgs[goCount * 2];
 
             allGo[0] = new GameObject("go0");
-            allRB[0] = FPRigidbody2DFactory.CreateBoxRB(new FPVector2(0, 0), 0, new FPVector2(1, 1));
+            allRB[0] = FPRigidbody2DFactory.CreateBoxRB(new FPVector2(0, 0), 0, new FPVector2(3, 3));
             allGo[0].transform.position = allRB[0].TF.Pos.ToVector2();
             allRB[0].SetGravityScale(0);
             space2D.Add(allRB[0]);
@@ -76,35 +86,61 @@ namespace JackFrame.FPPhysics2D {
             allRB[5].SetTrigger(true);
             space2D.Add(allRB[5]);
 
-            lineStartGo = new GameObject("lineStartGo");
-            lineStartGo.transform.position = new Vector2(-3, 3);
-            lineEndGo = new GameObject("lineEndGo");
-            lineEndGo.transform.position = new Vector2(3, 3);
+            rayStartGo = new GameObject("rayStartGo");
+            rayStartGo.transform.position = new Vector2(-3, 3);
+            rayEndGo = new GameObject("rayEndGo");
+            rayEndGo.transform.position = new Vector2(3, 3);
+
+            segmentStartGo = new GameObject("segmentStartGo");
+            segmentStartGo.transform.position = new Vector2(-3, 8);
+            segmentEndGo = new GameObject("segmentEndGo");
+            segmentEndGo.transform.position = new Vector2(3, 8);
 
             filter = new FPContactFilter2DArgs();
             filter.isFiltering = true;
             filter.useTriggers = false;
             filter.useLayerMask = true;
             filter.layerMask = 2;
-            filter.containHolder = false;
-            filter.containStatic = false;
-            filter.holderRBID = allRB[3].ID;
+
+            UnityTextWriter writer = new UnityTextWriter();
 
             Debug.Log("初始化成功");
 
         }
 
         Color rayColor = Color.yellow;
+        Color segmentColor = Color.green;
 
         void OnDrawGizmos() {
             space2D?.GizmosDrawAllRigidbody();
-            if ((lineEndGo != null) && (lineStartGo != null)) {
-                Gizmos.color = rayColor;
-                Gizmos.DrawLine(lineStartGo.transform.position, lineEndGo.transform.position);
-            }
-            //GizmosHelper.DrawPoint(pointToDraw, Color.cyan);
-            GizmosHelper.DrawCube(pointToDraw, new FPVector2((FP64)0.2, (FP64)0.2), Color.cyan);
 
+            if ((rayEndGo != null) && (rayStartGo != null)) {
+                Gizmos.color = rayColor;
+                Gizmos.DrawLine(rayStartGo.transform.position, rayEndGo.transform.position);
+            }
+            if ((segmentEndGo != null) && (segmentStartGo != null)) {
+                Gizmos.color = segmentColor;
+                Gizmos.DrawLine(segmentStartGo.transform.position, segmentEndGo.transform.position);
+            }
+            if ((rayHitPoints == null) || (segmentHitPoints == null)) {
+                return;
+            }
+
+            for (int i = 0; i < rayHitPoints.Length; i++) {
+                if (rayHitPoints[i] == null) {
+                    continue;
+                }
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawCube(rayHitPoints[i].ToVector2(), new Vector2(0.2f, 0.2f));
+            }
+            for (int i = 0; i < segmentHitPoints.Length; i++) {
+                if (segmentHitPoints[i] == null) {
+                    continue;
+                }
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawCube(segmentHitPoints[i].ToVector2(), new Vector2(0.2f, 0.2f));
+            }
+            //hitPoints.Clear();
         }
 
         public void Clear() {
@@ -135,27 +171,40 @@ namespace JackFrame.FPPhysics2D {
                     if ((allGo[i] != null) && (allRB[i] != null)) {
                         allRB[i].SetPos(new FPVector2((FP64)allGo[i].transform.position.x, (FP64)allGo[i].transform.position.y));
                         allRB[i].SetRotRadianAngle((FP64)allGo[i].transform.rotation.eulerAngles.z);
-                        //Debug.Log("设置坐标:" + allGo[i].name + ":" + allRB[i].TF.Pos);
-                        if (allRB[i].TF.RadAngle != FP64.Zero) {
-                            Debug.Log("设置角度:" + allGo[i].name + ":" + allRB[i].TF.RadAngle + ";rotation=" + allGo[i].transform.rotation.eulerAngles.z);
-                        }
                     }
                 }
             }
 
-            var rayStart = new FPVector2((FP64)lineStartGo.transform.position.x, (FP64)lineStartGo.transform.position.y);
-            var rayEnd = new FPVector2((FP64)lineEndGo.transform.position.x, (FP64)lineEndGo.transform.position.y);
+            var rayStart = new FPVector2((FP64)rayStartGo.transform.position.x, (FP64)rayStartGo.transform.position.y);
+            var rayEnd = new FPVector2((FP64)rayEndGo.transform.position.x, (FP64)rayEndGo.transform.position.y);
+            var rayDistance = (rayEnd - rayStart).Length();
+            var rayDirection = rayEnd - rayStart;
+            var ray = new FPRay2D(rayStart, rayDirection);
 
+            var segmentStart = new FPVector2((FP64)segmentStartGo.transform.position.x, (FP64)segmentStartGo.transform.position.y);
+            var segmentEnd = new FPVector2((FP64)segmentEndGo.transform.position.x, (FP64)segmentEndGo.transform.position.y);
+            var segment = new FPSegment2D(segmentStart, segmentEnd);
 
-
-            var isHit = getterAPI.Raycast2D(rayStart, rayEnd, filter, hits);
-            if (isHit) {
+            var isHitRay = getterAPI.Raycast2D(ray, rayDistance, filter, rayHits);
+            if (isHitRay) {
                 rayColor = Color.red;
-                pointToDraw = hits[0].point;
-                Debug.Log("碰撞");
+                Array.Clear(rayHitPoints, 0, rayHits.Length);
+                rayHitPoints[0] = rayHits[0].point;
             } else {
+                Array.Clear(rayHitPoints, 0, rayHits.Length);
                 rayColor = Color.yellow;
             }
+
+            var isHitSegment = getterAPI.SegmentCast2DAll(segment, filter, segmentHits);
+            if (isHitSegment) {
+                segmentColor = Color.red;
+                segmentHitPoints[0] = segmentHits[0].points[0];
+                segmentHitPoints[1] = segmentHits[0].points[1];
+            } else {
+                Array.Clear(segmentHitPoints, 0, segmentHits.Length);
+                segmentColor = Color.green;
+            }
+
             var deltaTime = FP64.EN3 * 34;
             space2D.Tick(deltaTime);
         }
